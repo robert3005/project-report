@@ -1,0 +1,156 @@
+\documentclass[10pt, a4paper]{report}
+
+\title{Cycling simulation\\or\\\textit{When} to break-away?}
+\date{\today}
+\author{Robert Kruszewski}
+
+
+%\setlength\parindent{0pt}
+\usepackage{tabularx, alltt, amsmath, multirow, graphicx, url, graphics, caption, natbib}
+
+%Our Executive Summary
+\renewcommand{\abstractname}{Abtract}
+
+% Better looking chapters headings
+\usepackage{titlesec}
+\titleformat{\chapter}
+  {\normalfont\LARGE\bfseries}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
+
+
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\center % Center everything on the page
+
+%----------------------------------------------------------------------------------------
+%   HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE Imperial College London}\\[1.5cm] % Name of your university/college
+\textsc{\Large Department of Computing}\\[0.5cm] % Major heading such as course name
+\textsc{\large}\\[0.5cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%   TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+{ \huge \bfseries Accelerating agent based\\\vspace{0.4cm}Python models}\\[0.4cm] % Title of your document
+\HRule \\[1.5cm]
+
+%----------------------------------------------------------------------------------------
+%   AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Authors:}\\
+Robert Kruszewski\\
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+Dr. Anthony \textsc{Field} \\% Supervisor's Name
+Michael \textsc{Lange} \\% Supervisor's Name
+%Michael \textsc{Hadjiyiannis}
+\end{flushright}
+\end{minipage}\\[5cm]
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+%\Large \emph{Author:}\\
+%John \textsc{Smith}\\[3cm] % Your name
+
+%----------------------------------------------------------------------------------------
+%   DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \today}\\[3cm] % Date, change the \today to a set date if you want to be precise
+
+%----------------------------------------------------------------------------------------
+%   LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+%\includegraphics{Logo}\\[1cm] % Include a department/university logo - this will require the graphicx package
+
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with white space
+\end{titlepage}
+
+%% Ending of title page
+
+\tableofcontents
+
+% \begin{abstract}
+% \end{abstract}
+
+
+
+\chapter{Introduction}\label{ch:intro}
+
+% Have a stab after getting background together
+
+\chapter{Background}\label{ch:bkg}
+
+\section{Ecosystem Modelling}\label{sec:ecomodel}
+
+\section{Lagrangian Ensemble}\label{sec:le}
+
+\section{Virtual Ecology Workbench}\label{sec:vew}
+
+\subsection{Virtual Ecology Workbench 3D}\label{subsec:vew3d}
+
+\section{Fluidity}\label{sec:fluidity}
+
+\section{Parallelisation}\label{sec:parallel}
+
+\subsection{Architectures}\label{subsec:}
+
+\subsection{Sandy Bridge}\label{subsec:potoo}
+
+\subsection{Ivy Bridge}\label{subsec:lab}
+
+\subsection{Haswell}\label{subsec:notebook}
+
+\subsection{OpenMP}\label{subsec:openmp}
+
+% \chapter{''chapter''}   0   only books and reports
+% \section{''section''}   1   not in letters
+% \subsection{''subsection''}     2   not in letters
+% \subsubsection{''subsubsection''}   3   not in letters
+% \paragraph{''paragraph''}   4   not in letters
+% \subparagraph{''subparagraph''}     5   not in letters
+
+\chapter{Development Plan}\label{ch:plan}
+
+\section{Accomplished}\label{sec:acc}
+
+% Cython
+% Threading/optimisations
+
+\section{Next steps}\label{sec:next}
+
+% explore different platforms (different number of cores and memory)
+% measure single core performance against optimised c version
+
+% integrate with fluidity (test on CX1 cluster to validate earlier points tested with simpler model)
+% optimise mesh partitioning
+
+\section{Possible extensions}\label{sec:ext}
+
+% One of those to show the system is performant and easy to use
+% reconstruct other experiments with our approach
+% Implement biodiversity simulation
+% Implement large eddy simulation
+
+% To add something to the bibliography, look for the "import into BibTex" thingy on google scholar, and add the stuff into refs.bib.
+\bibliographystyle{apalike}
+\bibliography{References}
+
+\end{document}
