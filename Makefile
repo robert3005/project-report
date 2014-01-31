@@ -8,4 +8,5 @@ watch:
 	./build.sh
 
 clean:
-	rm -f *.synctex.gz *.fdb_latexmk *.aux *.bbl *.blg *.dvi *.toc *.log
+	@# Remove all ignored files apart from sublime project settings
+	git clean -e "*sublime*" -xf
