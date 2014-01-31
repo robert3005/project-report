@@ -1,4 +1,4 @@
 #!/bin/sh
-while inotifywait -e modify Report.tex; do
+while inotifywait -e modify -e attrib Report.tex; do
 	make all
 done
