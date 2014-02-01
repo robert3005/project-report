@@ -96,7 +96,7 @@ Michael \textsc{Lange} \\% Supervisor's Name
 \chapter{Introduction}\label{ch:intro}
 
 Given growth of computational power of our machines it appears to be natural to model real life events with
-higher fidelity. Presented by \cite{Woods2005} shows how a model can be designed to provide tradeoff between
+higher fidelity. Presented by \cite{Woods2005} shows how a model can be designed to provide trade-off between
 computational performance and accuracy. Being the precursor of Lagrangian Ensemble modeling the initial
 model had limitations and even though useful had left much to be desired. Main limitation was due to treatment
 of physical environment as a 1D space with no horizontal movement. Despite the fact that 3D models were created \cite{VEW3D}
@@ -177,7 +177,7 @@ been employed previously. First of all plankton we are considering lives only in
 ocean structure of which is largely controlled by vertical fluxes. Furthermore the ecosystem variables
 are more correlated along horizontal axis than vertical. Furthermore plankton, behaviour of which we are
 trying to simulate, does not have any means of actively changing their horizontal location. However, they
-can influence their vertical location to end in more favorable ambient environment. One dimensional
+can influence their vertical location to end in more favourable ambient environment. One dimensional
 physical model is a good approximation. However, we have to remember that most of the accuracy of the simulation
 is a result of it. Incorporating horizontal flows would require three dimensional LE metamodel which was
 demonstrated to be possible by \cite{VEW3D}.
@@ -206,7 +206,7 @@ how to deal with by using particle management.
 \subsection{Particle Management}\label{sec:pm}
 Despite the LE metamodel ability to limit errors of emergent properties of simulated ecosystems an agent
 repartitioning strategy is required. We need to ensure that each population is represented by
-adequate number of subpopulations. Quite often it happens that agent is dropped from simulation
+adequate number of sub-populations Quite often it happens that agent is dropped from simulation
 since its sub-population size had reached zero. This behaviour left uncorrected would result
 in decreasing number of agents used to compute emergent properties of population and biofeedback.
 As a consequence the sampling quality of our simulation would decline as time progressed.
@@ -259,7 +259,7 @@ volume methods in one, two and three dimensions. The CDF application is
 parallelized using MPI and uses adaptive remeshing technology to optimize
 the underlying mesh at runtime, providing computational efficiency and
 dynamic focus on regions of interest. The Fluidity-ICOM ocean model
-also provides multiple sub-grid scale parameterizations to model turbulent
+also provides multiple sub-grid scale parametrization to model turbulent
 mixing as well as an interface for embedding Eulerian models of plankton
 biochemistry.
 \\\\
@@ -300,7 +300,7 @@ is highly portable and purely dependent on availability of compatible compilers.
 With the use of functionality provided by OpenMP API highly parallel and portable programs
 can be created easily. The compiler directives work by extending base language in
 order to provide single program multiple data (SPMD), tasking and worksharing constructs.
-Support for sharing and privitazing data is also provided.
+Support for sharing and privatizing data is also provided.
 \\\\
 OpenMP API attempts only to handle user-directed parallelisation where it is the programmers
 responsibility to specify actions to be taken at runtime in order to execute the program
@@ -315,7 +315,7 @@ which prevents memory corruption. CPython use reference counting in order to per
 In order to the garbage collection to be successful the counts have to stay exact at any given point
 in the program.
 \\\\
-Initially CPython had not been written with multithreading in mind and Global Interpreter Lock
+Initially CPython had not been written with multi-threading in mind and Global Interpreter Lock
 looked like a best solution since it was twice as fast as a per object locking implementation.
 Since then due to the growth of the code base any attempt to remove GIL has never come to fruition.
 In general GIL is not a problem since most of the tasks are not CPU bound and spend more time doing
@@ -354,11 +354,11 @@ In addition to benchmarking multi threaded version of the simulation there is ne
 single core efficiency.
 
 Given adequate performance the work could then be merged into version of VEW that works on top of Fluidity
-and confirm that the performance improvements occur also in real case scenarios and tht the approach in itself
+and confirm that the performance improvements occur also in real case scenarios and the the approach in itself
 is feasible for larger simulations.
 
 There is a presumption that given highly parallel agent code the mesh repartitioning might become a bottleneck.
-If this turns out to be the case then the aim will be to minimise the severence of slowdown and optimise
+If this turns out to be the case then the aim will be to minimise the severity of slowdown and optimise
 mesh repartitioning during simulation.
 
 \section{Possible extensions}\label{sec:ext}
