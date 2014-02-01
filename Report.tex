@@ -1,12 +1,14 @@
-\documentclass[10pt, a4paper]{report}
+\documentclass[12pt, a4paper]{report}
 
-\title{Cycling simulation\\or\\\textit{When} to break-away?}
+\title{Accelerating agent based\\Python models}
 \date{\today}
 \author{Robert Kruszewski}
 
 
 %\setlength\parindent{0pt}
 \usepackage{tabularx, alltt, amsmath, multirow, graphicx, url, graphics, caption, natbib}
+
+\usepackage[hidelinks]{hyperref}
 
 %Our Executive Summary
 \renewcommand{\abstractname}{Abstract}
@@ -16,7 +18,6 @@
 \titleformat{\chapter}
   {\normalfont\LARGE\bfseries}{\thechapter}{1em}{}
 \titlespacing*{\chapter}{0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
-
 
 \begin{document}
 
@@ -94,56 +95,279 @@ Michael \textsc{Lange} \\% Supervisor's Name
 
 \chapter{Introduction}\label{ch:intro}
 
-% Have a stab after getting background together
+Given growth of computational power of our machines it appears to be natural to model real life events with
+higher fidelity. Presented by \cite{Woods2005} shows how a model can be designed to provide tradeoff between
+computational performance and accuracy. Being the precursor of Lagrangian Ensemble modeling the initial
+model had limitations and even though useful had left much to be desired. Main limitation was due to treatment
+of physical environment as a 1D space with no horizontal movement. Despite the fact that 3D models were created \cite{VEW3D}
+they did not constitute a new approach.
+\\\\
+With recent advancements in general purpose software to simulate computational fluid dynamics \cite{Piggot2008,fluidity}
+scenarios it is a logical next step to combine the two. Given adaptive unstructured mesh and Lagrangian Ensemble simulation
+the benefits of both systems managed to be combined via \cite{FluidityVEW}.
+\\\\
+This work aims to build on work presented in \cite{FluidityVEW}. Despite the fact that feasibility and correctness of
+suggested integration was presented in the work the resulting system has performance issues. Due to the fact that
+core of the simulation is already heavily optimized the attention is focused on improving execution of user defined functions
+which serve as a definition of agents in the simulation.
+\\\\
+Using Cython we demonstrate that with certain limitations to expressiveness Python code can be multi threaded and show
+that as a result the biggest bottleneck is removed. Tests have been conducted on several machines of different architecture
+to prove that the result is consistent with improved isoefficiency of the program.
+\\\\
+Having shown that the approach is feasible we integrate it back to Fluidity-ICOM in order to demonstrate that with all
+major bottlenecks removed the resulting software can be used to recreate complicated experiments in an consistent fashion.
+\\\\
+Main contribution of this work is providing production ready simulation software with expressive interface and ease of
+configuration.
 
 \chapter{Background}\label{ch:bkg}
 
-\section{Ecosystem Modelling}\label{sec:ecomodel}
-\cite{Woods2005}
+\section{VEW}\label{sec:vew}
 
-\section{Lagrangian Ensemble}\label{sec:le}
+Rigorous methodology for modeling requires clear separation of concerns. Virtual Ecology Workbench \cite{Woods2005}
+is a modeling suite which distinguishes between components responsible for metamodel, model, scenario,
+integration and job control. Lagrange Ensemble is a metamodel used in the tool. It allows for natural
+integration of life history of individual plankters as well as derivation of bulk properties of population.
+Due to the expressiveness of individual based model and unlimited time frame modeling can be very
+computationally expensive and requires substantial programming knowledge.
+\\\\
+However, due to \cite{Planktonica}, there is a high level language, called Planktonica, available. It
+allows researchers to use familiar methods and not be concerned with computational complexity. Planktonica
+takes the equations describing the model and converts them into Java code which then can be fed to VEW
+simulation. The abstraction that Planktonica provides allows researchers to specify the behaviour of the
+model using primitive rules derived from reproducible laboratory experiments. As a result of simplicity of
+the tool complex models can be created without specialist programming knowledge as was demonstrated
+in \cite{IndvPlanktonEcosystems}.
 
-\section{Virtual Ecology Workbench}\label{sec:vew}
+\subsection{Lagrangian Ensemble Metamodel}\label{sec:lemeta}
+There are different methods of expressing metamodel of a biological simulation. There are three different
+metamodels being in use currently, box metamodel, field metamodel and individual-based metamodel. The first
+one describes the population by dividing it spatially, according to some similarity measure,
+and predicting changes on average in given area. The second metamodel expresses each population in terms
+of spatial field while the last treats each plankters as separate organism in the simulation and allows
+the properties of population to emerge from interaction of those individuals. Each next metamodel is more
+computationally expensive than the previous one but also allows for more accurate representation of
+the scenario we are modeling. Only with advent of supercomputers we have been able to make
+individual based models computationally feasible at a necessary scale. What we want to focus on
+is Lagrange Ensemble metamodel which was created by \cite{Woods2005}. The name comes from the
+specification of the metamodel as it uses biologically-lagrangian approach to trace life of each planter
+while using field metamodel to derive bulk properties of population as a whole.
+\\\\
+The Lagrangian Ensemble Metamodel results in a compromise between field and individual based approaches.
+Important factor to remember is that each agent in the simulation represents number of identical individuals.
+The sub-population of an agent is dynamic and governed by particle management rules. In the extreme
+LE metamodel can approximate individual based metamodel, i.e. when sub-population size is set to 1.
+On the other extreme it can be used to represent field metamodel by creating only one subpopulation. As a result
+of this flexibility LE metamodel does not allow for direct interaction between individuals.
+With the ability to adjust sub-population size of agents the LE metamodel allows us to address computational performance
+while limiting demographic noise.
 
-\subsection{Virtual Ecology Workbench 3D}\label{subsec:vew3d}
+\subsection{Physical Environment}\label{subsec:microsom}
+Our initial treatment of ecosystem simulation will deal with one-dimensional implementation of LE metamodel
+representing open ocean where depth of water exceeds 1 km. The system is designed to simulate virtual
+environment which extends along vertical axis from sea surface to depth of, usually, 0.5km. We allow
+for atmospheric effects like infra-red radiation, heat and water vapour influence top levels of the system
+while the bottom part is open which leads to detritus sinking to the deep ocean. There is free flow
+of water through the side walls of the simulated environment.
+\\\\
+In order to simplify the model we assume that the horizontal advection does not influence any
+ecosystem property at all depths. There are few reasons for this assumption despite the fact that it has
+been employed previously. First of all plankton we are considering lives only in the upper levels of the
+ocean structure of which is largely controlled by vertical fluxes. Furthermore the ecosystem variables
+are more correlated along horizontal axis than vertical. Furthermore plankton, behaviour of which we are
+trying to simulate, does not have any means of actively changing their horizontal location. However, they
+can influence their vertical location to end in more favorable ambient environment. One dimensional
+physical model is a good approximation. However, we have to remember that most of the accuracy of the simulation
+is a result of it. Incorporating horizontal flows would require three dimensional LE metamodel which was
+demonstrated to be possible by \cite{VEW3D}.
+
+\subsection{Agents}\label{sec:agents}
+Lagrange Ensemble simulation groups number of plankters of same characteristic
+to form an agent and comprise sub-population of said agent. In any simulation
+there can be multiple functional groups which define behaviour of agents in response
+to properties of environment \cite{IndvPlanktonEcosystems}. The behaviour
+of agents is defined in terms of fundamental biological and chemical properties
+which are derivable using reproducible laboratory experiments. Therefore, despite the
+fact that each agent behaves like a single organism it account for a sub-population
+of dynamically adjusted size,
+\\\\
+Any functional group in the simulation can have many species which can occur
+in different biological stages. Each agent holds several state variables responsible
+for representing internal pool of chemicals. Combined with physical properties on an
+environment such as depth in water column it is used to defined agents state. Based
+of each plankters species and stage we can model its behaviour at given step in the simulation.
+\\\\
+As a result of independence of updates of agent state all of the bio-chemical processes
+can be defined in one set of rules for any species in a particular stage. Consequently
+the agents may change their internal biological state non-deterministically which we will see
+how to deal with by using particle management.
+
+\subsection{Particle Management}\label{sec:pm}
+Despite the LE metamodel ability to limit errors of emergent properties of simulated ecosystems an agent
+repartitioning strategy is required. We need to ensure that each population is represented by
+adequate number of subpopulations. Quite often it happens that agent is dropped from simulation
+since its sub-population size had reached zero. This behaviour left uncorrected would result
+in decreasing number of agents used to compute emergent properties of population and biofeedback.
+As a consequence the sampling quality of our simulation would decline as time progressed.
+LE has a way of correcting this behaviour and ensuring consistent sampling throughout lifetime
+of simulation. What we end up doing is splitting an agent and creating another one with half of
+its population and set it on independent trajectory. Threshold at which such splitting is occur
+is left for the user to be specified. Using this method we can avoid having population represented
+by few agents which sub-populations have grown disproportionately large.
+\\\\
+On the other hand we have the computational complexity of the model. We should not exceed number
+of agents necessary to obtain desired accuracy threshold with respect to biofeedback and predation
+since we would be doing redundant work. Metamodel contains a way to combine two agents
+with sub-population being the size of constituent sub-populations and chemical pools that combine the two.
+The state of the resulting agent is a weighted average of agents used to create it. Since inter-sub-population
+variability is lost as a result of this process it should only occur when it would not have adverse effects
+on accuracy of the simulation. This procedure is particularly useful if agents contain dead plankton since then
+remineralisation acts on a single pool for each chemical in the combined one rather than separately for the
+constituent agents.
+\\\\
+Given that we might want to calculate life expectancy, birth rate and death rate of plankton population
+the splitting and merging procedure has to have all of its occurrences logged. Due to the fact that
+those events affect population statistics they have to be accounted for when computing desired values
+for our population.
+
+\section{LERM Toy Model}\label{subsec:lermtm}
+What has been described so far is the classical model employed by VEW. For the proof of concept work
+we will be dealing with a toy model. The toy model is a simplified version of ``LERM-PS'' simulation which
+is based on the Lagrangian Ensemble Recruitment Model (LERM), developed in \cite{FisheriesRecruitment}.
+The model simulates statically anchored water column in the Azores region over the duration of two years.
+% It exhibits a VEW-characteristic curve, showing Diatom bloom during the summer and autumn period of each year.
+
+Since the toy model represents only a subset of complete LERM model we are only concerned with Diatoms, which
+are plant-based plankters. Each Diatom can be either Dead or Living. Top level predators as well as Copepods (animal-based plankton)
+are ignored in this version of the model. There is no predation between agents, hence there is no need to simulate
+ingestion. Furthermore we disregard bio-optical feedback. Instead we read properties of physical environment
+from data file which is generated by full Java LERM simulation.
+
+\section{VEW 3D}\label{subsec:vew3d}
+One example of how Virtual Ecology Workbench is being extended is work presented in \cite{FluidityVEW}
+which integrates Fluidity as an underlying particle management system in the simulation. Given
+mesh adaptability there is possibility to simulate wider range of environments by also keeping computational
+complexity of the model at an acceptable level.
 
 \section{Fluidity}\label{sec:fluidity}
+Fluidity-ICOM is an open-source general-purpose ocean model based on
+the computational fluid dynamics (CFD) code Fluidity \cite{Piggot2008,fluidity}. Fluidity is
+capable of solving the Navier-Stokes and accompanying field equations on
+arbitrary unstructured finite element meshes, using finite element/control
+volume methods in one, two and three dimensions. The CDF application is
+parallelized using MPI and uses adaptive remeshing technology to optimize
+the underlying mesh at runtime, providing computational efficiency and
+dynamic focus on regions of interest. The Fluidity-ICOM ocean model
+also provides multiple sub-grid scale parameterizations to model turbulent
+mixing as well as an interface for embedding Eulerian models of plankton
+biochemistry.
+\\\\
+Fluidity is highly configurable via graphical user interface tool Diamond
+which comprises larger scheme-driven description library Spud\cite{ham2009spud}. Using the tool
+users are able to define properties to be computed during the simulation.
+Fluidity has three types of fields \cite{fluidity}:
+
+\begin{itemize}
+  \item Prognostic fields are computed through solving partial different equations.
+    User can specify discretisation used during solve phase as well as initial and boundary
+    conditions via Diamond.
+  \item Diagnostic fields are computed from other fields without solving a
+    partial differential equation.
+  \item Prescribed fields are defined by external sources. They can encapsulate a constant
+    or a user defined function which can, i.e. be used to derive environment condition
+\end{itemize}
 
 \section{Parallelisation}\label{sec:parallel}
 
-\subsection{Architectures}\label{subsec:}
+\subsection{Isoefficiency}\label{sec:isoeff}
 
-\subsection{Sandy Bridge}\label{subsec:potoo}
-
-\subsection{Ivy Bridge}\label{subsec:lab}
-
-\subsection{Haswell}\label{subsec:notebook}
+Isoefficiency is a measure of how in relation to growth in number of parallel execution units the working set has to grow in order to maintain same efficiency of the system. In general with growing working set size given constant number of processors the efficiency increases while the inverse happens when working set size is constant and number of parallel execution units increases.
+\begin{equation}\label{eq:isoeff} W = \dfrac{E}{1-E}T_o(W,p) \end{equation}
+\ref{eq:isoeff} describes relation between working set size and efficiency for parallel system as defined in \cite{grama2003introduction}.
+For any scalable system efficiency can be maintained at a fixed value if the ratio \[\dfrac{T_o}{W}\] is kept at a constant value.
+Let \[K = \dfrac{E}{1-E}\] be a constant depending on the efficiency to be maintained. The we have
+\begin{equation}\label{eq:isoconst} W = KT_o(W,p) \end{equation} Knowing properties for a particular system we can obtain value of W
+as a function of p which dictates the rate at which working set size has to grow in order to maintain fixed efficiency.
 
 \subsection{OpenMP}\label{subsec:openmp}
+OpenMP\cite{OpenMP3.1} is collection of compiler directives, library routines, and environment variables
+which together form an API that allows for seamless shared-memory parallelism
+in C, C++ and Fortran.
+\\\\
+Due to abstract nature of the directives the parallel programming model that it proposes
+is highly portable and purely dependent on availability of compatible compilers.
+With the use of functionality provided by OpenMP API highly parallel and portable programs
+can be created easily. The compiler directives work by extending base language in
+order to provide single program multiple data (SPMD), tasking and worksharing constructs.
+Support for sharing and privitazing data is also provided.
+\\\\
+OpenMP API attempts only to handle user-directed parallelisation where it is the programmers
+responsibility to specify actions to be taken at runtime in order to execute the program
+in parallel. Therefore, OpenMP complaint implementations do not perform any checking for
+data dependencies, conflicts, race conflicts or deadlocks all of which are possible.
+OpenMP does not support compiler-generated automatic parallelisation nor does it provide
+any hints to assist in generation of such code.
 
-% \chapter{''chapter''}   0   only books and reports
-% \section{''section''}   1   not in letters
-% \subsection{''subsection''}     2   not in letters
-% \subsubsection{''subsubsection''}   3   not in letters
-% \paragraph{''paragraph''}   4   not in letters
-% \subparagraph{''subparagraph''}     5   not in letters
+\subsection{CPython Global Interpreter Lock}\label{subsec:gil}
+Python Global Interpreter Lock is a mechanism used in CPython (most wide used Python implementation)
+which prevents memory corruption. CPython use reference counting in order to perform garbage collection.
+In order to the garbage collection to be successful the counts have to stay exact at any given point
+in the program.
+\\\\
+Initially CPython had not been written with multithreading in mind and Global Interpreter Lock
+looked like a best solution since it was twice as fast as a per object locking implementation.
+Since then due to the growth of the code base any attempt to remove GIL has never come to fruition.
+In general GIL is not a problem since most of the tasks are not CPU bound and spend more time doing
+I/O when the lock can be released. However, GIL can lead to unexpected results when dealing with
+multi threaded Python programs as presented in \cite{UnderstandingGIL}.
+
+% \subsection{Architectures}\label{subsec:arch}
 
 \chapter{Development Plan}\label{ch:plan}
 
+The general goal of the project is to build on top of work done by \cite{FluidityVEW}
+to be able to achieve same performance level as when using VEW in 1D environment. As
+described in the further work in said paper, given appropriate optimisations, this project
+would allow to model wide range of processes and allow for large range of applications
+of VEW.
+
 \section{Accomplished}\label{sec:acc}
 
-% Cython
-% Threading/optimisations
+Currently there is proof of concept work done on 1D LERM toy model. It uses Cython
+in order to replace C generated by Planktonica with Python code. Using Cython has
+many advantages like clear interface and no need to manually interact with Python C API.
+
+Since Python version of the simulation is considerably slower than pure C some investigation
+with a profiler had been done to identify hot stops and attempt to optimise those.
+
+Further initial attempt at parallelising Python version of the simulation had been done, however,
+care had to be taken to account for issues with GIL described in \ref{subsec:gil}.
 
 \section{Next steps}\label{sec:next}
 
-% explore different platforms (different number of cores and memory)
-% measure single core performance against optimised c version
+What remains to be done in the near future is to have a fully parallelised version of Python model.
+Having that test on different architectures will be undertaken to show that the simulation can be
+efficiently threaded and to demonstrate the degree of speed up.
 
-% integrate with fluidity (test on CX1 cluster to validate earlier points tested with simpler model)
-% optimise mesh partitioning
+In addition to benchmarking multi threaded version of the simulation there is need to optimise
+single core efficiency.
+
+Given adequate performance the work could then be merged into version of VEW that works on top of Fluidity
+and confirm that the performance improvements occur also in real case scenarios and tht the approach in itself
+is feasible for larger simulations.
+
+There is a presumption that given highly parallel agent code the mesh repartitioning might become a bottleneck.
+If this turns out to be the case then the aim will be to minimise the severence of slowdown and optimise
+mesh repartitioning during simulation.
 
 \section{Possible extensions}\label{sec:ext}
+
+All of the previous points would allow to write sophisticated simulations in a more streamlined way. Possible
+extensions include implementing simulations done in other papers to show that our system can scale to large
+problem sizes for complex simulations. Decision is yet to be made which results will be attempted to be replicated.
+The underlying assumption is that the recreated simulation would be simpler and would run using general purpose simulation
+software which in our case is VEW on top of Fluidity (developed by \cite{FluidityVEW}).
 
 % One of those to show the system is performant and easy to use
 % reconstruct other experiments with our approach
@@ -151,7 +375,6 @@ Michael \textsc{Lange} \\% Supervisor's Name
 % Implement large eddy simulation
 
 % To add something to the bibliography, look for the "import into BibTex" thingy on google scholar, and add the stuff into refs.bib.
-\bibliographystyle{apalike}
-\bibliography{References}
+\bibliographystyle{plain} \bibliography{References}
 
 \end{document}
