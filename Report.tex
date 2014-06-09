@@ -31,8 +31,8 @@
 %   HEADING SECTIONS
 %----------------------------------------------------------------------------------------
 
-\textsc{\LARGE Imperial College London}\\[1.5cm] % Name of your university/college
-\textsc{\Large Department of Computing}\\[0.5cm] % Major heading such as course name
+\textsc{\large Imperial College London}\\[1.5cm] % Name of your university/college
+\textsc{\large Department of Computing}\\[0.5cm] % Major heading such as course name
 \textsc{\large}\\[0.5cm] % Minor heading such as course title
 
 %----------------------------------------------------------------------------------------
@@ -49,16 +49,16 @@
 
 \begin{minipage}{0.4\textwidth}
 \begin{flushleft} \large
-\emph{Authors:}\\
+\emph{Author:}\\
 Robert Kruszewski\\
 \end{flushleft}
 \end{minipage}
 ~
 \begin{minipage}{0.4\textwidth}
 \begin{flushright} \large
-\emph{Supervisor:} \\
+\emph{Supervisors:} \\
 Dr. Anthony \textsc{Field} \\% Supervisor's Name
-Michael \textsc{Lange} \\% Supervisor's Name
+Dr. Michael \textsc{Lange} \\% Supervisor's Name
 %Michael \textsc{Hadjiyiannis}
 \end{flushright}
 \end{minipage}\\[5cm]
@@ -95,35 +95,55 @@ Michael \textsc{Lange} \\% Supervisor's Name
 
 \chapter{Introduction}\label{ch:intro}
 
-Given growth of computational power of our machines it appears to be natural to model real life events with
-higher fidelity. Presented by \cite{Woods2005} shows how a model can be designed to provide trade-off between
-computational performance and accuracy. Being the precursor of Lagrangian Ensemble modeling the initial
-model had limitations and even though useful had left much to be desired. Main limitation was due to treatment
-of physical environment as a 1D space with no horizontal movement. Despite the fact that 3D models were created \cite{VEW3D}
-they did not constitute a new approach.
-\\\\
-With recent advancements in general purpose software to simulate computational fluid dynamics \cite{Piggot2008,fluidity}
-scenarios it is a logical next step to combine the two. Given adaptive unstructured mesh and Lagrangian Ensemble simulation
-the benefits of both systems managed to be combined via \cite{FluidityVEW}.
-\\\\
-This work aims to build on work presented in \cite{FluidityVEW}. Despite the fact that feasibility and correctness of
-suggested integration was presented in the work the resulting system has performance issues. Due to the fact that
-core of the simulation is already heavily optimized the attention is focused on improving execution of user defined functions
-which serve as a definition of agents in the simulation.
-\\\\
-Using Cython we demonstrate that with certain limitations to expressiveness Python code can be multi threaded and show
-that as a result the biggest bottleneck is removed. Tests have been conducted on several machines of different architecture
-to prove that the result is consistent with improved isoefficiency of the program.
-\\\\
-Having shown that the approach is feasible we integrate it back to Fluidity-ICOM in order to demonstrate that with all
-major bottlenecks removed the resulting software can be used to recreate complicated experiments in an consistent fashion.
-\\\\
-Main contribution of this work is providing production ready simulation software with expressive interface and ease of
-configuration.
+We want to use Python due to widespread use in research field.
+The problem - Python (CPython) isn't truly multithreaded
+    CPython (interpreter in use) has GIL
+        other implementations would be difficult to embed in C/Fortran code base
+
+State contributions
+    1. Familiar syntax
+    2. Same performance as pure C
+    3. Allows for multithreading and can be deployed in real life applications
 
 \chapter{Background}\label{ch:bkg}
 
+\section{Metamodel}\label{sec:meta}
+
+\subsection{Agent Metamodel}\label{subsec:agent-meta}
+
+\subsection{Field Metamodel}\label{subsec:field-meta}
+
+\subsection{Lagrangian Ensemble Metamodel}\label{subsec:le-meta}
+
+\begin{figure}[t]
+  \begin{center}
+    % \showthe\columnwidth % Use this to determine the width of the figure.
+    \includegraphics[width=\columnwidth]{fig1.eps}
+    \caption{\label{fig:sin_cos} Plot of the sine and cosine functions.}
+  \end{center}
+\end{figure}
+
 \section{VEW}\label{sec:vew}
+
+\subsection{Planktonica}\label{subsec:planktonica}
+
+\subsection{Physics}\label{subsec:physics}
+
+\section{Fluidity}\label{sec:fluidity}
+
+\subsection{3D Physics - Computational Fluid Dynamics}\label{subsec:3d-phys}
+
+\subsection{Model Specification - Python}\label{subsec:model-spec-py}
+
+\subsection{OpenMPI}\label{subsec:openmpi}
+
+\subsection{OpenMP}\label{subsec:openmpi}
+
+\section{Python}\label{sec:python}
+
+\subsection{Multithreading in Python}\label{subsec:mult-py}
+
+\subsection{GIL}\label{subsec:GIL}
 
 Rigorous methodology for modeling requires clear separation of concerns. Virtual Ecology Workbench \cite{Woods2005}
 is a modeling suite which distinguishes between components responsible for metamodel, model, scenario,
@@ -290,8 +310,8 @@ Let \[K = \dfrac{E}{1-E}\] be a constant depending on the efficiency to be maint
 \begin{equation}\label{eq:isoconst} W = KT_o(W,p) \end{equation} Knowing properties for a particular system we can obtain value of W
 as a function of p which dictates the rate at which working set size has to grow in order to maintain fixed efficiency.
 
-\subsection{OpenMP}\label{subsec:openmp}
-OpenMP\cite{OpenMP3.1} is collection of compiler directives, library routines, and environment variables
+\subsection{OpenMP}
+OpenMP\cite{OpenMP4.0} is collection of compiler directives, library routines, and environment variables
 which together form an API that allows for seamless shared-memory parallelism
 in C, C++ and Fortran.
 \\\\
@@ -320,59 +340,11 @@ looked like a best solution since it was twice as fast as a per object locking i
 Since then due to the growth of the code base any attempt to remove GIL has never come to fruition.
 In general GIL is not a problem since most of the tasks are not CPU bound and spend more time doing
 I/O when the lock can be released. However, GIL can lead to unexpected results when dealing with
-multi threaded Python programs as presented in \cite{UnderstandingGIL}.
+multithreaded Python programs as presented in \cite{UnderstandingGIL}.
 
 % \subsection{Architectures}\label{subsec:arch}
 
-\chapter{Development Plan}\label{ch:plan}
 
-The general goal of the project is to build on top of work done by \cite{FluidityVEW}
-to be able to achieve same performance level as when using VEW in 1D environment. As
-described in the further work in said paper, given appropriate optimisations, this project
-would allow to model wide range of processes and allow for large range of applications
-of VEW.
-
-\section{Accomplished}\label{sec:acc}
-
-Currently there is proof of concept work done on 1D LERM toy model. It uses Cython
-in order to replace C generated by Planktonica with Python code. Using Cython has
-many advantages like clear interface and no need to manually interact with Python C API.
-
-Since Python version of the simulation is considerably slower than pure C some investigation
-with a profiler had been done to identify hot stops and attempt to optimise those.
-
-Further initial attempt at parallelising Python version of the simulation had been done, however,
-care had to be taken to account for issues with GIL described in \ref{subsec:gil}.
-
-\section{Next steps}\label{sec:next}
-
-What remains to be done in the near future is to have a fully parallelised version of Python model.
-Having that test on different architectures will be undertaken to show that the simulation can be
-efficiently threaded and to demonstrate the degree of speed up.
-
-In addition to benchmarking multi threaded version of the simulation there is need to optimise
-single core efficiency.
-
-Given adequate performance the work could then be merged into version of VEW that works on top of Fluidity
-and confirm that the performance improvements occur also in real case scenarios and the the approach in itself
-is feasible for larger simulations.
-
-There is a presumption that given highly parallel agent code the mesh repartitioning might become a bottleneck.
-If this turns out to be the case then the aim will be to minimise the severity of slowdown and optimise
-mesh repartitioning during simulation.
-
-\section{Possible extensions}\label{sec:ext}
-
-All of the previous points would allow to write sophisticated simulations in a more streamlined way. Possible
-extensions include implementing simulations done in other papers to show that our system can scale to large
-problem sizes for complex simulations. Decision is yet to be made which results will be attempted to be replicated.
-The underlying assumption is that the recreated simulation would be simpler and would run using general purpose simulation
-software which in our case is VEW on top of Fluidity (developed by \cite{FluidityVEW}).
-
-% One of those to show the system is performant and easy to use
-% reconstruct other experiments with our approach
-% Implement biodiversity simulation
-% Implement large eddy simulation
 
 % To add something to the bibliography, look for the "import into BibTex" thingy on google scholar, and add the stuff into refs.bib.
 \bibliographystyle{plain} \bibliography{References}
