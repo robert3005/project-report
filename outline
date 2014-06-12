@@ -74,6 +74,7 @@ Evaluation
 Related Work
     PyPy STM - still not fully working
     pyparallel - only suitable for I/O
+    Julia - still new and untested
 
     multithreaded python interpreter like Jython or IronPython
         No easy way to embed them in C
