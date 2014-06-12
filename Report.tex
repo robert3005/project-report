@@ -6,16 +6,69 @@
 \date{\today}
 \author{Robert Kruszewski}
 
-
+\usepackage[usenames,dvipsnames]{color}
 %\setlength\parindent{0pt}
-\usepackage{tabularx, alltt, amsmath, multirow, graphicx, url, graphics, caption, natbib}
-\usepackage{listings}
-\usepackage{parcolumns}
+\usepackage{tabularx, alltt, amsmath, multirow, graphicx, url, graphics, caption, natbib, listings, fancyhdr}
 
 \usepackage[hidelinks]{hyperref}
 
+\lstdefinelanguage[GNU99]{C}[99]{C}
+  {morekeywords={asm,__asm__,__extension__,typeof,__typeof__}%
+  }%
+
+\lstdefinelanguage[99]{C}%
+  {morekeywords={_Bool,_Complex,_Imaginary,auto,break,case,char,%
+      const,continue,default,do,double,else,enum,extern,float,for,%
+      goto,if,inline,int,long,register,restrict,return,short,signed,%
+      sizeof,static,struct,switch,typedef,union,unsigned,void,volatile,%
+      while},%
+   sensitive,%
+   morecomment=[s]{/*}{*/},%
+   morecomment=[l]//,%
+   morestring=[b]",%
+   morestring=[b]',%
+   moredelim=*[directive]\#,%
+   moredirectives={define,elif,else,endif,error,if,ifdef,ifndef,line,%
+      include,pragma,undef,warning}%
+  }[keywords,comments,strings,directives]%
+
+\definecolor{lightgray}{rgb}{0.83, 0.83, 0.83}
+\definecolor{lightcarminepink}{rgb}{0.9, 0.4, 0.38}
+
+\definecolor{cython-line-1}{rgb}{1,1,0.28}
+\definecolor{cython-line-2}{rgb}{1,1,0.91}
+\definecolor{cython-line-3}{rgb}{1,1,0.13}
+\definecolor{cython-line-4}{rgb}{1,1,0.59}
+\definecolor{cython-line-5}{rgb}{1,1,0.83}
+
+\lstset{
+  basicstyle=\ttfamily,                   % Code font, Examples: \footnotesize, \ttfamily
+  keywordstyle=\color{lightcarminepink},        % Keywords font ('*' = uppercase)
+  commentstyle=\color{Gray},              % Comments font
+  numbers=none,                           % Line nums position
+  numberstyle=\tiny,                      % Line-numbers fonts
+  stepnumber=1,                           % Step between two line-numbers
+  numbersep=5pt,                          % How far are line-numbers from code
+  backgroundcolor=\color{White}, % Choose background color
+  frame=none,                             % A frame around the code
+  tabsize=2,                              % Default tab size
+  captionpos=t,                           % Caption-position = bottom
+  breaklines=true,                        % Automatic line breaking?
+  breakatwhitespace=false,                % Automatic breaks only at whitespace?
+  showspaces=false,                       % Dont make spaces visible
+  showtabs=false,                         % Dont make tabls visible
+  columns=fullflexible,                       % Column format
+}
+
+\lhead[\rm\thepage]{\fancyplain{}{\sl{\rightmark}}}
+\rhead[\fancyplain{}{\sl{\leftmark}}]{\rm\thepage}
+\chead{}\lfoot{}\rfoot{}\cfoot{}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}
+
 %Our Executive Summary
 \renewcommand{\abstractname}{Abstract}
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}
 
 % Better looking chapters headings
 \usepackage{titlesec}
@@ -89,22 +142,33 @@ Dr. Michael \textsc{Lange} \\% Supervisor's Name
 \end{titlepage}
 %% Ending of title page
 
-\pagenumbering{roman}
-\tableofcontents
 
 \begin{abstract}
 \begin{center}
 \lbrack ABSTRACT\rbrack
 \end{center}
 \end{abstract}
-\pagenumbering{arabic}
 
+\renewcommand{\abstractname}{Acknowledgements}
+\begin{abstract}
+\begin{center}
+\lbrack ACKNOWLEDGEMENTS\rbrack
+\end{center}
+\end{abstract}
+
+\pagenumbering{roman}
+\tableofcontents
+
+\pagenumbering{arabic}
 
 
 \chapter{Introduction}\label{ch:intro}
 \begin{center}
 \lbrack INTRODUCTION\rbrack
 \end{center}
+\section{Motivation}\label{sec:intro-motiv}
+\section{Objectives}\label{sec:intro-obj}
+\section{Contributions}\label{sec:intro-contrib}
 % We want to use Python due to widespread use in research field.
 % The problem - Python (CPython) isn't truly multithreaded
 %     CPython (interpreter in use) has GIL
@@ -185,7 +249,7 @@ and behaviour has to be extracted. While in nature the behaviour of
 individual organisms lends itself to emergence of patterns in changes
 of system properties.
 
-\paragraph{Spatial Field}\label{par:field}
+\myparagraph{Spatial Field}\label{par:field}
 Spatial Field $F$ is a function of n dimensional spatial variables.
 We distinguish two types of fields: scalar, where the function $F$
 takes scalar values, e.g. concentration of chemical element at certain
@@ -370,7 +434,7 @@ communicate together.
 \begin{figure}[ht!]
   \centering
   \includegraphics[width=0.7\textwidth,natwidth=1080,natheight=604]{../planktonica.jpg}
-  \caption{Schematic working of Planktonica as described by Hinsley \cite{Planktonica}}
+  \caption{Schematic working of Planktonica taken from4 Hinsley \cite{Planktonica}}
   \label{fig:planktonica}
 \end{figure}
 
@@ -478,7 +542,7 @@ mixed layer depth model used in VEW and Fluidity's advection-diffusion
 equations. In order to achieve the desired effect K-profile parametrisation
 is used alongside VEW's MLD model.
 
-\paragraph{Adaptive Remeshing}\label{para:remesh}
+\myparagraph{Adaptive Remeshing}\label{para:remesh}
 What makes Fluidity attractive for large scale simulations is its ability
 to dynamically adapt the underlying mesh at runtime. The process minimises
 discretisation errors and focuses resolution on regions of particular interest.
@@ -520,13 +584,13 @@ The embedded interpreter is used two fold
   \item Space and time-varying field data - Space and time-varying field
 data may be entered as a Python function to define prescribed fields
 or enter the initial condition of a prognostic field.
-  \item Python State - Fluidity also provides access to its internal state and
-field data via the Python State interface. This interface allows the
-user to define custom diagnostic algorithms, where the nodal values
-of a diagnostic field are set by the user-defined Python function.
-Furthermore, this interface may also be used to define Eulerian ecology
-models by setting the relevant source and absorption terms of the
-prognostic fields representing the ecosystem components.
+  \item Internal State - Fluidity provides access to internal state
+  and field data via Python interface. Through this interface
+  the user can define own diagnostic algorithms where diagnostic
+  field values are set by user defined Python functions. The interface
+  may also be used to define ecology models by specifying relevant
+  source and absorption terms of the prognostic fields representing
+  the ecosystem elements.
 \end{itemize}
 
 \chapter{LERM}\label{ch:lerm-toy}
@@ -545,8 +609,11 @@ are ignored in this version of the model. There is no predation
 between agents, hence there is no need to simulate ingestion.
 While those restrictions focus biological environment we will also
 disregard bio-optical feedback and read physical environment
-information: temperature, visible irradiance, level of turbocline layer and depth of water column, from files
-generated by full Java based VEW simulation.
+information: temperature, visible irradiance, level of turbocline
+layer and depth of water column, from files generated by
+full Java based VEW simulation.
+
+\section{Simple LERM in Fluidity}\label{sec:lerm-simp-fluid}
 
 \chapter{Parallelisation}\label{ch:para}
 
@@ -555,7 +622,7 @@ Message Passing Interface is a way of distributing computation
 amongst several machines via network connection. Each of the
 machines (nodes) in the system is able to issue and receive
 messages which are a mean to spread the workload.
-OpenMPI is a result of merger of several MPI libraries, like
+OpenMPI \cite{gabriel04:_open_mpi} is a result of merger of several MPI libraries, like
 LAM/MPI, LA-MPI, and FT-MPI. It aims to standardise the implementation
 and improve interoperability. Thus reducing the burden on
 end users and increasing adoption. It provides production-quality
@@ -566,7 +633,7 @@ add-ons.
 
 \section{OpenMP}\label{subsec:openmp}
 While OpenMPI focuses on distributing workload amongst different
-machines OpenMP is used to distribute tasks in one machine amongst
+machines OpenMP \cite{OpenMP4.0} is used to distribute tasks in one machine amongst
 several cores. Due to it's memory oriented nature there's a significant
 penalty incurred when operating across different cache domains.
 OpenMP aims to provide compiler directives, library routines, and environment variables
@@ -591,7 +658,7 @@ Since OpenMP is tightly integrated with the compiler it is non-trivial to
 understand types of transformation that are performed to make program parallel.
 Listing \ref{list:openmp-dir} and \ref{list:openmp-run} shows one of the transformation that is performed.
 
-\begin{lstlisting}[caption=OpenMP directives,frame=tlrb,label=list:openmp-dir,language=c]{OpenMP directives}
+\begin{lstlisting}[caption=Code with OpenMP directives,frame=tlrb,label=list:openmp-dir,language=c]{OpenMP directives}
 #include <omp.h>
 void main() {
   #pragma omp parallel
@@ -602,7 +669,7 @@ void main() {
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption=OpenMP runtime,frame=tlrb,label=list:openmp-run,language=c]{OpenMP runtime}
+\begin{lstlisting}[caption=Code from \ref{list:openmp-dir} with substituted runtime library calls,frame=tlrb,label=list:openmp-run,language=c]{OpenMP runtime}
 void __ompregion_main1(...) {
   int ID = ompc_get_thread_num();
   printf(“Hello world(%d)”,ID);
@@ -625,16 +692,178 @@ Let \[K = \dfrac{E}{1-E}\] be a constant depending on the efficiency to be maint
 as a function of p which dictates the rate at which working set size has to grow in order to maintain fixed efficiency.
 
 \section{Python Multithreading}\label{subsec:mult-py}
+Python as a programming language dates back to beginning of 90s. Since that
+time it has grown to be one of the most widely used general purpose scripting
+languages. Due to its high abstraction level it allows expressing concepts in
+few lines of code. Furthermore it provides large standard library.
+
+Python is a truly multithreaded language. Each of the threads that are spawned
+by interpreter are first class operating system threads. As such Python gives
+ability to write applications running on large machines. There's a caveat, namely
+the Global Interpreter Lock (GIL). Due to GIL besides threading concurrency model
+Python provides process level concurrency. Since each process has its own address
+space and memory they do not interfere with each other and can run in parallel.
+Due to inter process communication there is a significant overhead incurred
+when passing values around between processes. In order to mitigate the drawbacks
+of memory passing Python aims to provide non blocking interfaces for I/O and
+networking operations which effectively make explicit threading redundant. However,
+Python does not have a good solution for threading CPU intensive programs. There are
+numerous extensions, most prominent of which are numpy and scipy, which aim to provide
+true parallelism for CPU intensive operations. However, they achieve this effect
+not in pure Python but by delegating the computation to external C or Fortran modules
+which can run unaffected by GIL.
+
+It has to be noted that Python as a language has multiple implementations. Most
+widely used are CPython (reference implementation), PyPy (CPython compatible implementation
+with JIT capabilities), IronPython (Python implementation in C\#)
+and Jython (JVM based implementation). The GIL problem only applies to CPython
+and implementations that are compatible with it. Given the fact that other
+versions don't have widespread adoption Python is often exclusively associated
+with CPython. Given the fact that majority of Python modules are written to conform with
+CPython API any implementation without CPython compatibility stands little chance
+of widespread adoption and success.
 
 \subsection{Global Interpreter Lock (GIL)}\label{subsec:GIL}
+The Python reference implementation (CPython) has been written with Global
+Interpreter Lock. What GIL does is to ensure that only one thread at a time
+modifies the internal memory of interpreter. This in turn is necessary
+due to CPython memory model. By using reference counting for garbage collection
+CPython removes burden of explicit memory management, however, for the
+scheme to work the reference counts have to be accurate. Therefore whenever
+an object in Python is created and modified the thread has to acquire an
+exclusive lock for memory modification. As a result of GIL regardless
+of number of threads if the application wants to interpret Python code
+it will use only one thread. This behaviour is a bottleneck for CPU
+intensive applications rendering them exclusively single threaded.
 
-% \chapter{Embedding Python in C applications}\label{ch:python-embedding}
+\myparagraph{Removing GIL}\label{para:remove-gil}
+With shift from faster processors to more cores per processor in CPU
+design the GIL had become a central issue to threading Python code.
+First proposal to remove GIL from Python occurred in 1999 when Greg Stein
+replaced GIL in Python 1.5 with fine-grained locks \cite{Guido:GIL}. However, the resulting
+code was almost two times slower than version with global lock,
+moreover there was no clear gain from threading the interpreter due
+to lock contention being a bottleneck. As a result the changes have
+disappeared over time. The need to remove GIL lessened over time
+with development of modules which operate in pure C or Fortran code
+and therefore can be treaded. In case of I/O and networking the
+problem is mitigated with asynchronous calls. GIL remains issue
+only for CPU intensive tasks.
 
-% \section{Python C-API}\label{sec:python-capi}
+There are downsides to removing GIL though. Without guarantees from
+the interpreter that extension will can be executing only once at
+a time the development of them become more difficult. Without GIL
+developers of 3rd party modules has to make their code thread-safe
+which can prove to be difficult and require significant effort.
 
-% \section{Cython}\label{sec:cython}
+\chapter{Embedding Python in C}\label{ch:python-embedding}
+As a result of CPython being written in C it exposes native C API for
+programs that wish to use its facilities. Thus Python code can be
+interpreted without explicitly invoking interpreter in another process.
 
-% \subsection{Avoiding GIL}\label{subsec:avoiding-gil}
+\section{Python/C API}\label{sec:python-capi}
+The listing \ref{list:python-embed} illustrates the calls necessary
+to execute Python code from C program. The example only shows
+high level embedding where Python is still responsible for parsing
+code and there is no interaction between application and interpreter
+state.
+
+\begin{lstlisting}[caption=Embedding Python code (taken from Python documentation),frame=tlrb,label=list:python-embed,language=c]{Python embedding}
+#include <Python.h>
+
+int main(int argc, char *argv[]) {
+  Py_SetProgramName(argv[0]);  /* optional but recommended */
+  Py_Initialize();
+  PyRun_SimpleString("from time import time,ctime\n"
+                     "print 'Today is',ctime(time())\n");
+  Py_Finalize();
+  return 0;
+}
+\end{lstlisting}
+
+In order to achieve complex interaction we would have to dig
+through API reference to understand how Python represents variables
+internally and find correct ways to modify them. Needless to say
+despite very thorough documentation, writing C instead of Python
+greatly increases verbosity of the program. Owing to the fact
+that Python has a stable API better approaches have been proposed,
+most significant of which is Cython. Cython allows users to write
+Python like syntax which in turn is compiled to Python C/API
+with appropriate function calls and boilerplate generated
+automatically. Cython gives the flexbility of Python while allowing
+compatibility with C applications without the need to understand
+inner workings of CPython.
+
+\section{Cython}\label{sec:cython}
+Cython \cite{Cython} is an optimising compiler which extends Python syntax in order
+to allow mixed compilation to Python C/API and direct C/C++. Cython
+relies on principle that knowing size and contents of the variable,
+namely the type, allows the compiler to generate efficient machine
+code to represent the operation. Without types and type inference
+mechanisms the interpreter has to assume nothing and execute code
+that can handle all cases, more efficient code can almost always
+be generated. Cython extends Python syntax to allow for defining
+C/C++ like elements. As such it provides facility for declaring types
+of variables. Furthermore it allows for easy wrapping of C/C++ code
+thus enabling seamless integration.
+
+Listing \ref{list:python-cython} shows sample Cython code with all possible
+annotations. While such code can be more concisely expressed in Python, the type
+annotations can give significant speed improvements. The Cython version is
+\emph{16 times} faster than pure Python version of this function.
+
+\begin{lstlisting}[
+    caption=Sample Cython code,
+    frame=tlrb,
+    label=list:python-cython,
+    language=python]{Python cython}
+cpdef int sumTo(int num):
+    cdef int c = 0
+    cdef int i
+    for i in range(num + 1):
+        c = c + i
+    return c
+\end{lstlisting}
+
+\subsection{Avoiding GIL}\label{subsec:avoiding-gil}
+As a consequence of providing type annotations it is possible to generate
+pure C/C++ from Cython code. This means the code does not rely on Python/C API
+while preserving compatibility with Python and allowing for fallback if necessary.
+Cython provides annotation facility to easily associate source code with
+corresponding generated code. It also provides visual feedback on how expensive
+in terms of lines of code given source line is.
+
+\begin{lstlisting}[
+    caption=Python code annotated by cython,
+    frame=tlrb,
+    label=list:python-annot,
+    language=python,
+    escapechar=!]{Python annotated}
+!\colorbox{cython-line-1}{def sumTo(num):}!
+    !\colorbox{cython-line-2}{c = 0}!
+    !\colorbox{cython-line-3}{for i in range(num + 1):}!
+        !\colorbox{cython-line-4}{c = c + i}!
+    !\colorbox{cython-line-5}{return c}!
+\end{lstlisting}
+
+Listing \ref{list:python-annot} shows output produced by cython annotate
+for pure python version of the code. The more yellow the line is the
+more lines it will take in the generated c code. If the line is white
+the source code line will have direct translation to one line of C/C++ code.
+
+\chapter{Optimising Simple LERM Model}\label{ch:opt-simpl-lerm}
+
+\chapter{Evaluation}\label{ch:evaluation}
+
+\section{Initial vs target performance}\label{sec:init-vs-target}
+
+\chapter{Conclusion}\label{ch:concl}
+
+\section{Summary}\label{sec:summary}
+
+\section{Future Work}\label{sec:future}
+
+\section{Related Work}\label{sec:related}
 
 % \begin{figure}[t]
 %   \begin{center}
