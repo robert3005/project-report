@@ -8,7 +8,7 @@
 
 \usepackage[usenames,dvipsnames]{color}
 %\setlength\parindent{0pt}
-\usepackage{tabularx, alltt, amsmath, multirow, graphicx, url, graphics, caption, natbib, listings, fancyhdr}
+\usepackage{tabularx, alltt, amsmath, multirow, graphicx, url, graphics, caption, natbib, listings, fancyhdr,lstlinebgrd,etoolbox}
 
 \usepackage[hidelinks]{hyperref}
 
@@ -434,7 +434,7 @@ communicate together.
 \begin{figure}[ht!]
   \centering
   \includegraphics[width=0.7\textwidth,natwidth=1080,natheight=604]{../planktonica.jpg}
-  \caption{Schematic working of Planktonica taken from4 Hinsley \cite{Planktonica}}
+  \caption{Schematic working of Planktonica taken from Hinsley \cite{Planktonica}}
   \label{fig:planktonica}
 \end{figure}
 
@@ -838,12 +838,18 @@ in terms of lines of code given source line is.
     frame=tlrb,
     label=list:python-annot,
     language=python,
-    escapechar=!]{Python annotated}
-!\colorbox{cython-line-1}{def sumTo(num):}!
-    !\colorbox{cython-line-2}{c = 0}!
-    !\colorbox{cython-line-3}{for i in range(num + 1):}!
-        !\colorbox{cython-line-4}{c = c + i}!
-    !\colorbox{cython-line-5}{return c}!
+    linebackgroundcolor={
+      \ifnumequal{\value{lstnumber}}{1}{\color{cython-line-1}}{}
+      \ifnumequal{\value{lstnumber}}{2}{\color{cython-line-2}}{}
+      \ifnumequal{\value{lstnumber}}{3}{\color{cython-line-3}}{}
+      \ifnumequal{\value{lstnumber}}{4}{\color{cython-line-4}}{}
+      \ifnumequal{\value{lstnumber}}{5}{\color{cython-line-5}}{}
+  }]{Python annotated}
+def sumTo(num):
+    c = 0
+    for i in range(num + 1):
+        c = c + i
+    return c
 \end{lstlisting}
 
 Listing \ref{list:python-annot} shows output produced by cython annotate
