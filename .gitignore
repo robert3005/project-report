@@ -8,3 +8,6 @@
 *.fls
 *.out
 *.bak
+*.lof
+*.lol
+*.tdo
