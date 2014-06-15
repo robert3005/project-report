@@ -1,8 +1,6 @@
 all:
 	latex Report
 	bibtex Report
-	latex Report
-	pdflatex Report
 	pdflatex Report
 
 watch:
