@@ -1021,7 +1021,7 @@ link time library location resolution.
 
 The profiler output, however, has been obtained with different compilation
 flags and on different machine - quad core Haswell CPU (i7 4750 @ 2.0 GHz)
-and 16 GB ram. This is mostly due to VTune being a GUI program and a such it's
+and 16 GB RAM. This is mostly due to VTune being a GUI program and a such it's
 fastest to use it from machine with physical connection.
 To allow profiler properly resolve all symbols at runtime, the simulation
 was compiled with ``-Og'' (recommended optimisation level for debugging)
@@ -1690,9 +1690,9 @@ code is so fast the other non threadable components begin to play part. For 4000
 the impact of Particle Management is negligible at 358 ms while for 128000 agents it
 is already 17573 ms. If we look only at the agent update code for 128000 agents we
 will get speed up factor of 1.92. Similarly for 3 threads it is 2.76 and 3.53 for 4
-threads. While if look at whole program performance we only achieve 2.58 and 3.2 respectively.
+threads. While if look at the whole program performance we only achieve 2.58 and 3.2 respectively.
 
-Since the speed ups are not consistent amongst different agent levels it suggests that
+Since the speedups are not consistent amongst different agent levels it suggests that
 the overhead of data movement (even only to L3) is greater than gain in execution time.
 VTune confirms our findings saying that our program is backend bound (computation) and
 fully saturates floating point pipeline of the CPU.
@@ -1795,10 +1795,83 @@ More detailed analysis of multithreaded performance will be carried out in
 threads on 2 CPUs and how data movement and separate caches impact performance.
 
 \chapter{Fluidity Simple LERM Model}\label{ch:thread-fluid}
+Some of the design decisions that we have made when working with VEW based
+simulation were based on the fact that the target software which would
+be using our technique is different and exhibits different properties.
+For instance we need dynamic loading since Fluiditiy-ICOM is large
+piece of software and fully customisable by the user. Hence, recompiling
+it each time is not a possible solution. Secondly we have decided
+not to focus on any other parts of the simulation than the agent update.
+Being computational fluid dynamics computation software Fluidity is
+optimised to handle environment changes efficiently. We only have to consider
+performance of variable code supplied by the user. Furthermore Fluidity
+already embeds Python for customizing other parts of the runtime, hence,
+replacing Python with a different language would have increase amount
+of work necessary. Last but not least we have removed dictionaries in favour
+of plain arrays to optimise performance. This was dictated by Fluidity-ICOM
+configuration specification and ability to rewrite the code on the fly.
 
 \section{Implementation differences}\label{sec:impl-diff}
+Fluidity is significantly more sophisticated piece of software than the simple
+simulation we have been analysing. While there's benefit to be able to
+produce minimal viable product that has the characteristics of the target
+software. It speed up analysis and benchmarking significantly. To confirm
+that the methodology outline in Chapter \ref{ch:opt-simpl-lerm} is useful we have to
+show how to apply it to real simulation software. Fluidity provides the
+environment management and scaling. It uses OpenMPI to distribute the
+work to multiple machines. Due to its adaptive remeshing it can provide
+good trade-off between simulation resolution and performance. As a program
+Fluidity is a mixture between C and Fortran therefore we cannot chose
+different Python implementation than CPython. Furthermore it already
+integrates CPython (PyPy might have been an alternative provided it
+had better embedding capabilities). Fluidity reads the configuration from
+xml file supplied by the user. For purpose of ecosystem modeling the
+configuration contains the code that defines functional groups in the
+simulation, specifies the initial conditions and types of fields that are
+present in the simulation. The code that will be run by the simulation has
+to be read from the file and compiled to then be executed for each of the agents.
+Furthermore the results of the agent code have to be passed to the Fortran
+physics engine to determine changes in the system.
 
 \section{Compiling agent code}\label{sec:compl-agent-code}
+Work on Fluidity integration was not completed as of writing this section. The
+section outlines the work done so far and the challenges that had to
+be overcome. Remaining pieces are porting of Fluidity-ICOM Python
+API for agents to not use Python C/API.
+
+When working with the simple VEW based simulation we had the convenience of
+non changing location of code and ability to change the agent update code
+freely. With Fluidity we can no longer assume this. The agent code provided
+by the user can be arbitrary Python code, i.e. import other modules. Needless to say we will
+have to introduce constraints on the type of code that the user can
+write. We have to have direct C/C++ translation in order to achieve GIL
+free execution. Throughout the development process Python's distutils have
+been used for compilation of Cython extensions. While distutils are
+easy to configure they can only operate on files. Therefore
+we construct the structure of the module on the fly while reading the
+configuration file. The additional complication comes from the fact
+that the compiled module with agent update and initialisation code has
+to be importable from Python.
+
+Hence, users cannot use non GIL-free code when defining their agents
+behaviour, i.e. type annotations have to be provided. Fluidity-ICOM
+will generate proper Cython header files to expose the C
+style functions from agent code. We rely on the fact that
+Cython generated modules expose pure C/C++ functions that can be used
+even if the module has not been properly initialised from Python's
+point of view. The glue code that provides interaction between
+user supplied code and simulation engine is responsible for setting
+up the user provided code in the module and importing it. We use
+C++ part to transform the code, only after the user
+supplied code has been compiled into a module the linking module
+is initialised - at this point Python will populate the symbols
+used in the module. This works due to the fact that C/C++ do not
+need to know definition of the function to compile the program that uses it
+but only the prototype is necessary. Only when the module is
+initialised the code is loaded and function symbols point to executable
+code. Before code is compiled it undergoes transformation to replace
+dictionary accesses to environment and agent variables with array indices.
+
 
 \chapter{Evaluation}\label{ch:evaluation}
 
@@ -2053,7 +2126,11 @@ However, Haswell has larger throughput and can sustain 256-bit loads and a
 128-bit reads and a 128-bit write per cycle. Given how dependent on data
 movements the performance is this seems to be an important feature. With our
 code performing large number of data lookups this difference seems to be
-significant.
+significant. Profiling output of the simulation code on Sandy Bridge EP
+architecture would be necessary to confirm the presumption. There is
+definitely something more involved happening as Haswell only promises
+roughly 10\% improvement for same clock speeds. Our simulation gets
+visibly larger boost from changing the underlying architecture.
 
 \section{Load Balancing}\label{sec:eval-load-balance}
 Through out the benchmarking process the OpenMP scheduler was set to ``runtime''
