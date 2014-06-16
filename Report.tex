@@ -12,7 +12,10 @@
 \usepackage{tabularx, alltt, amsmath, multirow, graphicx, url, graphics, caption, natbib, listings, fancyhdr, lstlinebgrd, etoolbox, todonotes, colortbl,}
 
 \usepackage[hidelinks]{hyperref}
-\usepackage[title,titletoc,toc,page]{appendix}
+\usepackage[title,titletoc]{appendix}
+\usepackage[nottoc,notlot,notlof]{tocbibind}
+% \usepackage[maxfloats=40]{morefloats}
+\usepackage{float}
 
 \lstdefinelanguage[GNU99]{C}[99]{C}
   {morekeywords={asm,__asm__,__extension__,typeof,__typeof__}%
@@ -166,6 +169,7 @@ Dr. Michael \textsc{Lange} \\% Supervisor's Name
 \pagenumbering{roman}
 \tableofcontents
 \listoffigures
+\listoftables
 \lstlistoflistings
 \todototoc
 \listoftodos
@@ -1127,7 +1131,7 @@ it won't be possible with some restrictions though, which will be described late
     64000            &  251018                   &  242488           &  7230                    &  1180                        \\
     128000           &  486010                   &  467940           &  16822                   &  1139                        \\ \hline
     \end{tabular}
-    \caption {Reference simulation version execution time}
+    \caption {Reference C version}
     \label{table:reference-timings}
   \end{center}
 \end{table}
@@ -1693,8 +1697,9 @@ the overhead of data movement (even only to L3) is greater than gain in executio
 VTune confirms our findings saying that our program is backend bound (computation) and
 fully saturates floating point pipeline of the CPU.
 
-\todo{include full results in appendix for comparison - not all of those numbers are
-visible from the graph}
+Full results with separation for agent update, Particle Management and environment management
+can be found in Appendix \ref{appen-ch:bench-results}. For table used to generate this graph refer
+to section about threading version with C arrays \ref{appen-subsec:bench-array-multi}.
 
 \begin{figure}[ht!]
   \begin{center}
@@ -1797,14 +1802,13 @@ threads on 2 CPUs and how data movement and separate caches impact performance.
 
 \chapter{Evaluation}\label{ch:evaluation}
 
+
 \section{Initial vs Target performance}\label{sec:init-vs-target}
 
 \section{Model Correctness}\label{sec:model-correct}
 \section{Parallel execution via C++}\label{sec:para-c++}
 
 \section{Using arrays}\label{sec:array-use}
-
-\section{Scalability}\label{sec:scalability}
 
 \section{Load Balancing}\label{sec:eval-load-balance}
 
@@ -1824,5 +1828,544 @@ threads on 2 CPUs and how data movement and separate caches impact performance.
 
 % To add something to the bibliography, look for the "import into BibTex" thingy on google scholar, and add the stuff into refs.bib.
 \bibliographystyle{plain} \bibliography{References}
+
+\begin{appendices}
+\chapter{Complete benchmark results}\label{appen-ch:bench-results}
+\section{Reference C version}\label{appen-sec:bench-ref-c}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 10367      & 8949        & 201     & 1117     \\
+    4000             & 17794      & 16243       & 336     & 1115     \\
+    8000             & 32749      & 30901       & 630     & 1118     \\
+    16000            & 62708      & 60207       & 1279    & 1120     \\
+    32000            & 121979     & 118034      & 2720    & 1122     \\
+    64000            & 251018     & 242488      & 7230    & 1180     \\
+    128000           & 486010     & 467940      & 16822   & 1139     \\ \hline
+    \end{tabular}
+    \caption {Reference C version}
+    \label{table:append-reference-timings}
+  \end{center}
+\end{table}
+
+\subsection{Threading}\label{appen-subsec:bench-ref-c-multi}
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 9931       & 8514        & 200     & 1117     \\
+    4000             & 16974      & 15421       & 337     & 1117     \\
+    8000             & 30795      & 28949       & 628     & 1118     \\
+    16000            & 59341      & 56839       & 1282    & 1119     \\
+    32000            & 115373     & 111407      & 2744    & 1121     \\
+    64000            & 228939     & 221410      & 6300    & 1126     \\
+    128000           & 460029     & 441934      & 16851   & 1138     \\ \hline
+    \end{tabular}
+    \caption {Reference C version, thread local variables, 1 thread, i7 4770}
+    \label{table:append-reference-timings-1-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 6691       & 4658        & 210     & 1713     \\
+    4000             & 10411      & 8242        & 344     & 1714     \\
+    8000             & 17875      & 15395       & 653     & 1715     \\
+    16000            & 32606      & 29483       & 1297    & 1714     \\
+    32000            & 62333      & 57743       & 2765    & 1713     \\
+    64000            & 122361     & 114219      & 6310    & 1718     \\
+    128000           & 246724     & 228165      & 16707   & 1729     \\ \hline
+    \end{tabular}
+    \caption {Reference C version, thread local variables, 2 threads, i7 4770}
+    \label{table:append-reference-timings-2-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 5485      & 3401       & 217    & 1753    \\
+    4000             & 8097      & 5871       & 355    & 1756    \\
+    8000             & 13311     & 10775      & 665    & 1753    \\
+    16000            & 23787     & 20587      & 1332   & 1750    \\
+    32000            & 44685     & 39974      & 2840   & 1752    \\
+    64000            & 87600     & 79179      & 6533   & 1766    \\
+    128000           & 176652    & 157819     & 16938  & 1765    \\ \hline
+    \end{tabular}
+    \caption {Reference C version, thread local variables, 3 threads, i7 4770}
+    \label{table:append-reference-timings-3-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 4995      & 2865       & 224    & 1791    \\
+    4000             & 7107      & 4835       & 366    & 1791    \\
+    8000             & 11269     & 8677       & 686    & 1790    \\
+    16000            & 19616     & 16342      & 1368   & 1789    \\
+    32000            & 36353     & 31553      & 2890   & 1789    \\
+    64000            & 70397     & 61860      & 6626   & 1789    \\
+    128000           & 142544    & 123327     & 17287  & 1797    \\ \hline
+    \end{tabular}
+    \caption {Reference C version, thread local variables, 4 threads, i7 4770}
+    \label{table:append-reference-timings-4-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 7506       & 4198        & 349     & 2771     \\
+    4000             & 10517      & 6992        & 597     & 2732     \\
+    8000             & 16756      & 12649       & 1177    & 2728     \\
+    16000            & 29337      & 23933       & 2465    & 2731     \\
+    32000            & 54366      & 46162       & 5256    & 2738     \\
+    64000            & 105048     & 90297       & 11805   & 2737     \\
+    128000           & 210575     & 179436      & 28188   & 2738     \\ \hline
+    \end{tabular}
+    \caption {Reference C version, thread local variables, 4 threads, E5-4650}
+    \label{table:append-reference-timings-4-thread-potoo}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 6796       & 3352        & 374     & 2837     \\
+    4000             & 8686       & 4962        & 639     & 2844     \\
+    8000             & 12518      & 8194        & 1256    & 2847     \\
+    16000            & 20321      & 14642       & 2593    & 2846     \\
+    32000            & 36065      & 27491       & 5491    & 2843     \\
+    64000            & 68202      & 52887       & 12233   & 2841     \\
+    128000           & 135243     & 103386      & 28777   & 2830     \\ \hline
+    \end{tabular}
+    \caption {Reference C version, thread local variables, 8 threads, E5-4650}
+    \label{table:append-reference-timings-8-thread-potoo}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 8964       & 5146        & 408     & 2991     \\
+    4000             & 11013      & 6992        & 667     & 2906     \\
+    8000             & 15368      & 10714       & 1268    & 2918     \\
+    16000            & 24213      & 18204       & 2593    & 2943     \\
+    32000            & 42078      & 33251       & 5488    & 2866     \\
+    64000            & 78707      & 63286       & 12060   & 2883     \\
+    128000           & 153211     & 121469      & 28363   & 2886     \\ \hline
+    \end{tabular}
+    \caption {Reference C version, thread local variables, 12 threads, E5-4650}
+    \label{table:append-reference-timings-12-thread-potoo}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 10055      & 6105        & 446     & 3040     \\
+    4000             & 11660      & 7450        & 693     & 3059     \\
+    8000             & 14974      & 10222       & 1292    & 3000     \\
+    16000            & 21790      & 15716       & 2617    & 2998     \\
+    32000            & 35682      & 26762       & 5450    & 3009     \\
+    64000            & 65098      & 49568       & 12041   & 3018     \\
+    128000           & 120900     & 88904       & 28521   & 3021     \\ \hline
+    \end{tabular}
+    \caption {Reference C version, thread local variables, 16 threads, E5-4650}
+    \label{table:append-reference-timings-16-thread-potoo}
+  \end{center}
+\end{table}
+
+
+\section{Embedded Python}\label{appen-sec:bench-cython-pure}
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 325084     & 323573      & 216     & 1160     \\
+    4000             & 625564     & 623909      & 355     & 1174     \\
+    8000             & 1220770    & 1218807     & 658     & 1177     \\
+    16000            & 2414316    & 2411665     & 1342    & 1182     \\
+    32000            & 4794589    & 4790293     & 2955    & 1213     \\ \hline
+    \end{tabular}
+    \caption {Embedded Python without types, i7 4770}
+    \label{table:append-cython-pure}
+  \end{center}
+\end{table}
+
+\section{Typed Cython}\label{appen-sec:bench-cython-typed}
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 204033     & 202538      & 217     & 1162     \\
+    4000             & 395733     & 394059      & 361     & 1176     \\
+    8000             & 764873     & 762901      & 665     & 1180     \\
+    16000            & 1524153    & 1521459     & 1340    & 1203     \\
+    32000            & 2995259    & 2991050     & 2877    & 1213     \\ \hline
+    \end{tabular}
+    \caption {Embedded Python with types, i7 4770}
+    \label{table:append-cython-types}
+  \end{center}
+\end{table}
+
+\section{C++ Wrappers}\label{appen-sec:bench-c++-wrap}
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 111538     & 110061      & 220     & 1147     \\
+    4000             & 213478     & 211845      & 366     & 1152     \\
+    8000             & 420091     & 418063      & 684     & 1181     \\
+    16000            & 862271     & 859401      & 1396    & 1231     \\
+    32000            & 1680127    & 1675556     & 3123    & 1223     \\
+    64000            & 3267826    & 3259086     & 7403    & 1202     \\
+    128000           & 6518203    & 6496939     & 19870   & 1240     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrappers, single thread, i7 4770}
+    \label{table:append-c++-wrap}
+  \end{center}
+\end{table}
+
+\subsection{Threading}\label{appen-subsec:bench-c++-wrap-multi}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 109784     & 108351      & 215     & 1117     \\
+    4000             & 208703     & 207125      & 356     & 1120     \\
+    8000             & 406965     & 405059      & 669     & 1133     \\
+    16000            & 801507     & 798934      & 1334    & 1135     \\
+    32000            & 1596247    & 1592161     & 2823    & 1157     \\
+    64000            & 3156307    & 3148548     & 6478    & 1175     \\
+    128000           & 6314339    & 6295635     & 17401   & 1193     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrapper, thread local variables, 1 thread, i7 4770}
+    \label{table:append-c++-wrap-1-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 56535      & 54494       & 221     & 1709     \\
+    4000             & 106238     & 104050      & 364     & 1713     \\
+    8000             & 206452     & 203945      & 683     & 1713     \\
+    16000            & 405493     & 402298      & 1361    & 1721     \\
+    32000            & 807339     & 802622      & 2878    & 1723     \\
+    64000            & 1610823    & 1602406     & 6560    & 1739     \\
+    128000           & 3207737    & 3188486     & 17359   & 1764     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrapper, thread local variables, 2 threads, i7 4770}
+    \label{table:append-c++-wrap-2-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 39636      & 37542       & 230     & 1751     \\
+    4000             & 73477      & 71232       & 375     & 1755     \\
+    8000             & 141472     & 138898      & 701     & 1755     \\
+    16000            & 277250     & 273981      & 1396    & 1755     \\
+    32000            & 550204     & 545372      & 2947    & 1765     \\
+    64000            & 1091675    & 1083077     & 6702    & 1772     \\
+    128000           & 2673766    & 2649609     & 21819   & 2057     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrapper, thread local variables, 3 threads, i7 4770}
+    \label{table:append-c++-wrap-3-thread-line}
+  \end{center}
+\end{table}
+
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 31650      & 29505       & 238     & 1792     \\
+    4000             & 57924      & 55625       & 389     & 1793     \\
+    8000             & 109936     & 107304      & 723     & 1791     \\
+    16000            & 215333     & 211983      & 1436    & 1793     \\
+    32000            & 423767     & 418837      & 3010    & 1798     \\
+    64000            & 844136     & 835373      & 6833    & 1804     \\
+    128000           & 1685321    & 1665606     & 17754   & 1823     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrapper, thread local variables, 4 threads, i7 4770}
+    \label{table:append-c++-wrap-4-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+     Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+     2000             & 47149      & 43876       & 364     & 2736     \\
+     4000             & 86151      & 82625       & 620     & 2725     \\
+     8000             & 163519     & 159392      & 1214    & 2727     \\
+     16000            & 318842     & 313403      & 2533    & 2717     \\
+     32000            & 630811     & 622483      & 5384    & 2749     \\
+     64000            & 1256646    & 1241841     & 11870   & 2743     \\
+     128000           & 2508931    & 2477873     & 28109   & 2754     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrapper, thread local variables, 4 threads, E5-4650}
+    \label{table:append-c++-wrap-4-thread-potoo}
+  \end{center}
+\end{table}
+
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 28362      & 24944       & 390     & 2826     \\
+    4000             & 48471      & 44783       & 662     & 2821     \\
+    8000             & 88985      & 84693       & 1285    & 2805     \\
+    16000            & 169752     & 164109      & 2637    & 2804     \\
+    32000            & 333228     & 324603      & 5585    & 2810     \\
+    64000            & 660038     & 644709      & 12303   & 2810     \\
+    128000           & 1315052    & 1283181     & 28860   & 2795     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrapper, thread local variables, 8 threads, E5-4650}
+    \label{table:append-c++-wrap-8-thread-potoo}
+  \end{center}
+\end{table}
+
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 24849      & 21056       & 423     & 2916     \\
+    4000             & 40179      & 36167       & 697     & 2862     \\
+    8000             & 70243      & 65576       & 1340    & 2870     \\
+    16000            & 131119     & 125047      & 2747    & 2877     \\
+    32000            & 252789     & 243691      & 5770    & 2883     \\
+    64000            & 495341     & 479304      & 12691   & 2881     \\
+    128000           & 978450     & 945744      & 29355   & 2888     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrapper, thread local variables, 12 threads, E5-4650}
+    \label{table:append-c++-wrap-12-thread-potoo}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 21911      & 18008       & 453     & 2989     \\
+    4000             & 33355      & 29182       & 727     & 2991     \\
+    8000             & 56429      & 51469       & 1411    & 3078     \\
+    16000            & 100770     & 94592       & 2738    & 2989     \\
+    32000            & 190983     & 181798      & 5740    & 2994     \\
+    64000            & 373209     & 357156      & 12607   & 3005     \\
+    128000           & 734170     & 700830      & 29871   & 3017     \\ \hline
+    \end{tabular}
+    \caption {C++ Wrapper, thread local variables, 16 threads, E5-4650}
+    \label{table:append-c++-wrap-16-thread-potoo}
+  \end{center}
+\end{table}
+
+\section{C Array}\label{appen-sec:bench-array}
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 10556      & 9085        & 218     & 1145     \\
+    4000             & 18231      & 16617       & 363     & 1143     \\
+    8000             & 33541      & 31608       & 677     & 1146     \\
+    16000            & 64107      & 61485       & 1357    & 1154     \\
+    32000            & 125411     & 121181      & 2918    & 1169     \\
+    64000            & 251418     & 242922      & 7162    & 1189     \\
+    128000           & 512821     & 489082      & 22370   & 1211     \\ \hline
+    \end{tabular}
+    \caption {C Arrays, single thread, i7 4770}
+    \label{table:append-c-arrays}
+  \end{center}
+\end{table}
+
+\subsection{Threading}\label{appen-subsec:bench-array-multi}
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 10412      & 8985        & 215     & 1113     \\
+    4000             & 17984      & 16413       & 358     & 1113     \\
+    8000             & 32901      & 31018       & 667     & 1116     \\
+    16000            & 62770      & 60222       & 1330    & 1118     \\
+    32000            & 121902     & 117875      & 2803    & 1122     \\
+    64000            & 242511     & 234888      & 6395    & 1125     \\
+    128000           & 484792     & 466671      & 16877   & 1136     \\ \hline
+     \end{tabular}
+    \caption {C Arrays, thread local variables, 1 threads, i7 4770}
+    \label{table:append-c-arrays-1-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 6940       & 4897        & 222     & 1709     \\
+    4000             & 10847      & 8661        & 365     & 1710     \\
+    8000             & 18725      & 16227       & 676     & 1709     \\
+    16000            & 34425      & 31254       & 1350    & 1709     \\
+    32000            & 67875      & 63188       & 2865    & 1710     \\
+    64000            & 135648     & 127317      & 6502    & 1714     \\
+    128000           & 261911     & 242871      & 17189   & 1725     \\ \hline
+     \end{tabular}
+    \caption {C Arrays, thread local variables, 2 threads, i7 4770}
+    \label{table:append-c-arrays-2-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 5662       & 3564        & 230     & 1751     \\
+    4000             & 8457       & 6207        & 378     & 1753     \\
+    8000             & 14144      & 11575       & 698     & 1751     \\
+    16000            & 25086      & 21823       & 1392    & 1750     \\
+    32000            & 48036      & 43234       & 2934    & 1747     \\
+    64000            & 93760      & 85031       & 6791    & 1813     \\
+    128000           & 188142     & 169023      & 17224   & 1761     \\ \hline
+     \end{tabular}
+    \caption {C Arrays, thread local variables, 3 threads, i7 4770}
+    \label{table:append-c-arrays-3-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 5123       & 2987        & 236     & 1787     \\
+    4000             & 7296       & 5001        & 386     & 1791     \\
+    8000             & 11777      & 9158        & 713     & 1786     \\
+    16000            & 20963      & 17634       & 1425    & 1786     \\
+    32000            & 38370      & 33466       & 2993    & 1789     \\
+    64000            & 75135      & 66343       & 6787    & 1883     \\
+    128000           & 151556     & 132051      & 17573   & 1797     \\ \hline
+     \end{tabular}
+    \caption {C Arrays, thread local variables, 4 threads, i7 4770}
+    \label{table:append-c-arrays-4-thread-line}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 7713       & 4439        & 364     & 2738     \\
+    4000             & 11115      & 7534        & 616     & 2789     \\
+    8000             & 17795      & 13665       & 1215    & 2733     \\
+    16000            & 31379      & 25919       & 2541    & 2731     \\
+    32000            & 58593      & 50322       & 5347    & 2735     \\
+    64000            & 114045     & 99229       & 11890   & 2733     \\
+    128000           & 227567     & 196481      & 28158   & 2733     \\ \hline
+    \end{tabular}
+    \caption {C Arrays, thread local variables, 4 threads, E5-4650}
+    \label{table:append-c-arrays-4-thread-potoo}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 6880       & 3463        & 384     & 2839     \\
+    4000             & 8929       & 5237        & 656     & 2838     \\
+    8000             & 13134      & 8783        & 1293    & 2850     \\
+    16000            & 21553      & 15835       & 2664    & 2847     \\
+    32000            & 38712      & 30058       & 5603    & 2841     \\
+    64000            & 72736      & 57408       & 12280   & 2837     \\
+    128000           & 143941     & 112058      & 28827   & 2828     \\ \hline
+    \end{tabular}
+    \caption {C Arrays, thread local variables, 8 threads, E5-4650}
+    \label{table:append-c-arrays-8-thread-potoo}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 9102       & 5209        & 422     & 3019     \\
+    4000             & 11370      & 7326        & 697     & 2885     \\
+    8000             & 16186      & 11518       & 1332    & 2871     \\
+    16000            & 26048      & 19962       & 2733    & 2879     \\
+    32000            & 45796      & 36715       & 5703    & 2906     \\
+    64000            & 85307      & 69392       & 12519   & 2925     \\
+    128000           & 168362     & 135517      & 29481   & 2881     \\ \hline
+    \end{tabular}
+    \caption {C Arrays, thread local variables, 12 threads, E5-4650}
+    \label{table:append-c-arrays-12-thread-potoo}
+  \end{center}
+\end{table}
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{|c||c||c|c|c|}
+    \hline
+    Number of agents & Total [ms] & Update [ms] & PM [ms] & Env [ms] \\ \hline
+    2000             & 10229      & 6314        & 448     & 3024     \\
+    4000             & 12522      & 8342        & 716     & 2999     \\
+    8000             & 17325      & 12519       & 1349    & 2993     \\
+    16000            & 26972      & 20779       & 2734    & 2998     \\
+    32000            & 46481      & 37264       & 5733    & 3024     \\
+    64000            & 86087      & 69976       & 12586   & 3065     \\
+    128000           & 164547     & 131024      & 29942   & 3109     \\ \hline
+    \end{tabular}
+    \caption {C Arrays, thread local variables, 16 threads, E5-4650}
+    \label{table:append-c-arrays-16-thread-potoo}
+  \end{center}
+\end{table}
+
+\chapter{Writing GIL free Cython code}
+The contents...
+\end{appendices}
+
 
 \end{document}
