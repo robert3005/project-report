@@ -2206,6 +2206,56 @@ is not far from Python though it is not technically Python. Additionally
 we achieve dynamic code loading and avoid recompiling whole simulation
 with every change to user supplied code.
 
+\section{Summary}\label{sec:summary}
+We had begun with embedding Python directly in the application. Instead of
+using Python C/API directly we had employed Cython to generate appropriate
+functions thus we had only write the code that was responsible for data
+conversion. The boilerplate involved when defining Python modules had
+been taken care of for us. The naive embedding while easy to implement
+and not requiring any code compilation was extremely slow. Even though
+the implementation avoided data copies the slowdown was by factor of \emph{35}.
+What is more naive embedding entails GIL when executing the code. The
+main objective of this project was to combine Python embedding and
+parallel execution. Once the initial setting and performance characteristics
+of the program had been understood we had set out to optimise the performance
+and provided true parallel execution.
+
+The strategy for achieving C level performance concentrated on one idea -
+avoid using Python interpreter as it is unable of generating efficient
+machine code. First types for variables used throughout Python code had
+been defined. That operation had cut down the penalty in half to roughly
+\emph{21} factor slowdown. Next step was to avoid using Python dictionaries
+while preserving name based access to agent's variables. This involved
+recreating wrapper created in Python in C++. As a result of replacing
+all of the code with typed versions and C++ containers instead of Python
+ones reliance on Python at runtime had been removed. This version while
+still \emph{11} times slower had the ability to execute on multiple threads.
+We have seen how the code scales. Nonetheless due to non linear scaling
+and significant single threaded performance slowdown this version was
+still not adequate for use in larger systems.
+
+The last step was to replace C++ containers and remove name based access
+to agent's variable. By using plain C arrays we had achieved performance
+levels of reference version while maintaining the ability to load code
+dynamically at runtime. Furthermore compatibility with Python had been
+preserved if multithreaded execution and performance are not a concern.
+
+We had looked at how the code scales and whether the simulation produces
+the same output. The code scales quite well when only one CPU is used.
+The non linear performance gain from larger number of threads suggests
+that the workload should be increased to achieve better efficiency.
+However, with multiple CPUs and inter CPU communication the performance
+benefit is non obvious. Since the simulation moves the data around
+due to development of agents the data layout cannot be fixed and
+latency of moving data around eliminates performance benefits coming
+from larger number of execution units.
+
+Finally sketch of implementation in Fluidity-ICOM had been outlined.
+This report came as a result of its performance drawbacks and it
+would be interesting to see improvements presented approach would
+give. As Fluidity is fully parallelisable the simulation should
+scale to very large models.
+
 \section{Related Work}\label{sec:related}
 The approach outlined in this report is not the only possible one to
 achieve thread level parallelisim in Python. Other projects present
@@ -2293,60 +2343,10 @@ Python syntax. Once again it is an argument to integrate Cython's capabilities
 directly into Python language to allow optional type specifications.
 
 Last but not least, the holy grail of Python multithreading, would be CPython
-implementation without GIL and with JIT capabilities. Thus removing the need
+implementation without GIL and with JIT compilation capabilities. Thus removing the need
 for direct compilation all together. This would entail creating a piece of
 software comparable with sophistication and complexity to JVM and .NET which
-is not likely to happen without clear need.
-
-\section{Summary}\label{sec:summary}
-We had begun with embedding Python directly in the application. Instead of
-using Python C/API directly we had employed Cython to generate appropriate
-functions thus we had only write the code that was responsible for data
-conversion. The boilerplate involved when defining Python modules had
-been taken care of for us. The naive embedding while easy to implement
-and not requiring any code compilation was extremely slow. Even though
-the implementation avoided data copies the slowdown was by factor of \emph{35}.
-What is more naive embedding entails GIL when executing the code. The
-main objective of this project was to combine Python embedding and
-parallel execution. Once the initial setting and performance characteristics
-of the program had been understood we had set out to optimise the performance
-and provided true parallel execution.
-
-The strategy for achieving C level performance concentrated on one idea -
-avoid using Python interpreter as it is unable of generating efficient
-machine code. First types for variables used throughout Python code had
-been defined. That operation had cut down the penalty in half to roughly
-\emph{21} factor slowdown. Next step was to avoid using Python dictionaries
-while preserving name based access to agent's variables. This involved
-recreating wrapper created in Python in C++. As a result of replacing
-all of the code with typed versions and C++ containers instead of Python
-ones reliance on Python at runtime had been removed. This version while
-still \emph{11} times slower had the ability to execute on multiple threads.
-We have seen how the code scales. Nonetheless due to non linear scaling
-and significant single threaded performance slowdown this version was
-still not adequate for use in larger systems.
-
-The last step was to replace C++ containers and remove name based access
-to agent's variable. By using plain C arrays we had achieved performance
-levels of reference version while maintaining the ability to load code
-dynamically at runtime. Furthermore compatibility with Python had been
-preserved if multithreaded execution and performance are not a concern.
-
-We had looked at how the code scales and whether the simulation produces
-the same output. The code scales quite well when only one CPU is used.
-The non linear performance gain from larger number of threads suggests
-that the workload should be increased to achieve better efficiency.
-However, with multiple CPUs and inter CPU communication the performance
-benefit is non obvious. Since the simulation moves the data around
-due to development of agents the data layout cannot be fixed and
-latency of moving data around eliminates performance benefits coming
-from larger number of execution units.
-
-Finally sketch of implementation in Fluidity-ICOM had been outlined.
-This report came as a result of its performance drawbacks and it
-would be interesting to see improvements presented approach would
-give. As Fluidity is fully parallelisable the simulation should
-scale to very large models.
+is not likely to happen without direct need for such solution.
 
 % To add something to the bibliography, look for the "import into BibTex"
 % thingy on google scholar, and add the stuff into refs.bib.
@@ -2887,8 +2887,101 @@ scale to very large models.
 \end{table}
 
 \chapter{Writing GIL free Cython code}
-\todo{copy code snippet from \ref{subsec:cython-code-annot}}
-\end{appendices}
+Cython is an optimising compiler which converts an extended Python syntax
+into native modules. The main goal of the project is to facilitate
+wrapping C/C++ code for use in Python and to be able to easily create
+Python modules.
 
+Cython extends Python syntax to allow specifying types. It allows
+us to define primitive types, pointer types and even provides
+way of specifying template parameters for C++ classes. Furthermore
+it allows the use of native C and C++ libraries. The only requirement
+is to provide Cython compatible header for those libraries. It
+is like specifying C header file in Cython syntax.
+
+With the ability to use parts of C/C++ naturally in Python code fragments
+we achieve better performance. However, if we take the practice to the
+extreme we are able to define pure C/C++ modules in Python like syntax.
+Furthermore the generated modules are fully compatible with Python and
+can be used from CPython interpreter with minor caveats. Direct C/C++
+translation allows us to circumvent CPython's GIL (Global Interpreter Lock)
+and achieve true thread level parallelism. There are few simple rules
+that need to be followed when we want use Cython to generate GIL free code.
+
+\begin{itemize}
+  \item Always declare variables with \lstinline{cdef} and provide their type.
+    Do not use PyObject as a type for those variables.
+  \item Do not use Python standard library. While this is a major limitation
+  of this approach there are plenty of C/C++ libraries that provide all of
+  the necessary capabilities. Though integration might not be straightforward.
+  \item When using containers make use of C++ STL implementations.
+    Cython provides wrappers by default and usage remains largely the same.
+  \item Always define functions as \lstinline{nogil}. Cython will give warnings
+    if parts of functions require GIL and will fail to compile.
+  \item Always define functions with \lstinline{cdef}. They will not be visible
+    from Python but will use C call semantics. If Python compatibility is required
+    then you clearly do not need GIL free execution.
+  \item When performing floating point arithmetic disable Python level division
+    exceptions. Since the function will not be called from Python context this
+    can only cause unforeseen segmentation faults. This can be done by specifying
+    \lstinline{cdivision=True} either in compiler options or as a file annotation.
+  \item If you are not sure what is default behaviour for allocating certain values
+    use type casting. This is especially useful for strings when Cython will
+    be default allocate Python's \lstinline{str} and only then coerce to desired
+    type. Use \lstinline{<char *>} to enforce C semantics.
+  \item When in doubt use Cython's annotation facility to illustrate where the
+    code translation is not direct.
+\end{itemize}
+
+Let's consider a simple example to illustrate the changes necessary for GIL avoidance.
+Consider function as shown in Listing \ref{list:appen-python-annot} which calculates
+sum of all natural numbers up to n. The highlighting is a result of Cython code
+annotation. The more saturated the colour the more lines of C/C++ code will the
+line take to express. Direct translations are without highlight as each line translates
+directly to one line of target code.
+
+\begin{lstlisting}[
+  caption=Python code annotated by cython,
+  label=list:appen-python-annot,
+  language=python,
+  linebackgroundcolor={
+    \ifnumequal{\value{lstnumber}}{1}{\color{cython-line-1}}{}
+    \ifnumequal{\value{lstnumber}}{2}{\color{cython-line-2}}{}
+    \ifnumequal{\value{lstnumber}}{3}{\color{cython-line-3}}{}
+    \ifnumequal{\value{lstnumber}}{4}{\color{cython-line-4}}{}
+    \ifnumequal{\value{lstnumber}}{5}{\color{cython-line-5}}{}
+}]
+def sumTo(n):
+    c = 0
+    for i in range(n + 1):
+        c = c + i
+    return c
+\end{lstlisting}
+
+Listing \ref{list:appen-python-annot} shows necessary changes to ensure that the
+function is translated directly into its C counterpart. All of the variables
+have type specified. The return type of the function is also provided. Function
+is declared as \lstinline{cdef} therefore it is only accessible from C like context.
+Cython translates the \lstinline{for in} construct into C for loop when types of
+variable being iterated and range boundaries are provided.
+
+\begin{lstlisting}[
+  caption=Annotated code from Listing \ref{list:appen-python-annot},
+  label=list:appen-python-cython,
+  language=python
+]
+cdef int sumTo(int n):
+    cdef int c = 0
+    cdef int i
+    for i in range(n + 1):
+        c = c + i
+    return c
+\end{lstlisting}
+
+Last but not least, do not be afraid to look at generated C files. While they
+can be large due to extensive boilerplate, once that is stripped out they are
+just plain C.
+
+\end{appendices}
 
 \end{document}
