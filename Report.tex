@@ -203,21 +203,103 @@ without you it would have been much more difficult to finish this project.
 \chapter{Introduction}\label{ch:intro}
 % Reset page numbers
 \pagenumbering{arabic}
+Practice of modelling ecosystems at large scale is relatively new and was
+only enabled by introduction of supercomputers and overall improvements
+in processing power. Previous attempts were unable to track individuals and thus
+recording their development history. One of the focus areas of marine ecosystem
+modelling is trying to understand development of plankton. With plankton contributing
+nearly 70\% of oxygen population understanding its behaviour had become increasingly
+important (\cite{Nogueira2006}) in attempt to control $CO_2$ emissions and increases in temperature.
+By modelling marine ecosystems we are able to obtain insight into interactions
+of plankton as well as development of higher order species, especially predators like
+different species of fish. Understanding marine ecosystems has become increasingly
+important as fisheries are struggling in maintaining healthy and stable population
+while attaining profits.
+
+With help of modelling we are able to answer questions about demographics of
+population without need to carry out labour intensive empirical experiments.
+Being able to track development of an individual through time plays crucial
+role in drawing conclusions from simulation results. In \cite{Woods2005} a
+Lagrangian Ensemble (LE) metamodel is described that aims to balance
+computational complexity of the simulation and accuracy of results. Virtual
+Ecology Workbench (VEW) uses LE to create one dimensional models of marine
+ecosystems. It provides user friendly way of defining the model and good
+scalability of the simulation. Recently, however, new tool - Fluidity-ICOM -
+had been created to overcome VEWs limitations of physical environment.
+Fluidity provides full three dimensional model together with turbulent
+nutrient dissipation by solving advection-diffusion equations.
 
 \section{Motivation}\label{sec:intro-motiv}
-\section{Objectives}\label{sec:intro-obj}
-\section{Contributions}\label{sec:intro-contrib}
-% We want to use Python due to widespread use in research field.
-% The problem - Python (CPython) isn't truly multithreaded
-%     CPython (interpreter in use) has GIL
-%         other implementations would be difficult to embed in C/Fortran code base
+With Fluidity-ICOM providing better capabilities for modelling large scale
+simulations it is not itself without limitations. As Fluidity-ICOM
+allows large degree of freedom when defining model parameters it allows
+the behaviour of species to be defined with use of arbitrary Python code.
+While VEW can use code generation techniques to optimise model equations
+the same is not possible in Fluidity. Therefore as a result of this large
+flexibility Fluidity-ICOM is unable to generate efficient code for the
+simulation thus performing significantly worse than similar VEW models.
+Being targeted for large scale simulations it is crucial that the
+framework itself can scale. As a result of using Python Fluidity-ICOM
+is limited to single thread execution when performing trivially
+parallelisable agent update (as all of the agents are independent of each
+other and any conflicts are resolved only once all agents have been updated).
+CPython, Python implementation used by Fluidity, uses Global Interpreter Lock
+to ensure that internal state of the interpreter is correct and memory
+is managed properly. However, due to GIL Python programs defy traditional
+parallelisation techniques.
 
-% \section{Contributions}\label{sec:contributons}
-% \begin{itemize}
-%     \item Familiar syntax
-%     \item Same performance as pure C
-%     \item Allows for multithreading and can be deployed in real life applications
-% \end{itemize}
+In \cite{FluidityVEW} we see that Fluidity-ICOM based models are stable even
+though the underlying environment is fundamentally more complex. With significant
+performance penalty, however, it will not be widely used for simulating
+marine ecosystems as even simplest models take hours to run.
+
+\section{Objectives}\label{sec:intro-obj}
+The aim of this work is to overcome performance bottlenecks due to Fluidity's
+flexibility when defining the model. The objective is two fold.
+
+First of all scalability limitations had to be removed. Python compatibility
+had to be maintained as Fluidity uses it to define other properties apart from
+agent biology. Therefore we had to find way to translate Python code into
+form that is not susceptible to GIL limitations.
+
+Second is to improve single threaded performance. VEW based simulations achieve
+native performance by compiling user specified models. By using Python
+Fluidity-ICOM is limited in types of optimisations it can perform. Overcoming
+Python as an abstraction layer that limits performance was considered to be
+equally important to achieving parallel execution.
+
+Last but not least is the need to maintain similarity to current system.
+Python is gaining adoption and is becoming popular scientists who are
+main users of simulation software like Fluidity. By keeping the solution
+as close to pure Python as possible we hope to not limit adoption of
+Fluidity-ICOM as an simulation tool.
+
+Tests initially had been carried out on simplified VEW based simulation
+to present feasibility of the approach. Only after satisfactory results
+had been obtained integration into Fluidity-ICOM had been attempted.
+
+\section{Contributions}\label{sec:intro-contrib}
+The contributions of this project are three fold.
+\begin{itemize}
+  \item We begin by demonstrating Python's impact on performance
+    of programs. In Chapter \ref{ch:opt-simpl-lerm} approach to
+    optimise Python inefficiencies away is presented. The solution to
+    achieving native performance from Python code is obtained using
+    Cython which is described by the end of Chapter \ref{ch:bkg}.
+    Further we move on to describing implementation approach of
+    Python optimisation strategy into Fluidity-ICOM
+    simulation software which is outlined in Chapter \ref{ch:thread-fluid}.
+  \item Set of rules for obtaining performing code from Python by
+    using Cython is outlined through Chapters \ref{ch:opt-simpl-lerm} and
+    \ref{ch:thread-fluid} (summary can be fond in Appendix
+    \ref{appen-ch:gil-free-cython-rules}). Following those rules results in code
+    similar to Python thus allowing users to migrate from pure Python easily.
+    The guidelines are general and not specific to our implementation.
+  \item We show that after producing Cython code that is performing at native
+    speed in single thread case the GIL issue is avoided. Thus
+    code can be parallelised. We then go on to show results for multithreaded
+    execution of our simulation in Chapter \ref{ch:evaluation}.
+\end{itemize}
 
 \chapter{Background}\label{ch:bkg}
 
@@ -2911,7 +2993,7 @@ is not likely to happen without direct need for such solution.
   \end{center}
 \end{table}
 
-\chapter{Writing GIL free Cython code}
+\chapter{Writing GIL free Cython code}\label{appen-ch:gil-free-cython-rules}
 Cython is an optimising compiler which converts an extended Python syntax
 into native modules. The main goal of the project is to facilitate
 wrapping C/C++ code for use in Python and to be able to easily create
