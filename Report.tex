@@ -254,12 +254,44 @@ performance penalty, however, it will not be widely used for simulating
 marine ecosystems as even simplest models take hours to run.
 
 \section{Objectives}\label{sec:intro-obj}
-The aim of this work is to overcome performance bottlenecks due to Fluidity's
-flexibility when defining the model. The objective is two fold.
+Cython is an optimising compiler for Python. With its help we aim to
+overcome performance bottlenecks due to Fluidity's flexibility when
+defining the model. Cython enables mixing of C/C++ and Python in order
+to enable easy embedding of Python and wrapping C/C++ libraries. We will
+use Cython for its ability to generate efficient machine code by using
+variables' types.
 
-First of all scalability limitations had to be removed. Python compatibility
-had to be maintained as Fluidity uses it to define other properties apart from
-agent biology. Therefore we had to find way to translate Python code into
+\noindent\begin{minipage}{.45\textwidth}
+\begin{lstlisting}[
+  caption=Python loop,
+  label=list:python-loop-intro,
+  language=python
+]
+c = 0
+for i in range(x):
+  c = c + i
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}{.45\textwidth}
+\begin{lstlisting}[
+  caption=Type annotations,
+  label=list:python-loop-intro-annot,
+  language=python]
+cdef int c = 0
+cdef int i
+for i in range(x):
+  c = c + i
+\end{lstlisting}
+\end{minipage}
+
+Code on Listing \ref{list:python-loop-intro} will use Python's generators
+to perform the loop while Listing \ref{list:python-loop-intro-annot} will
+be translated into C for loop.
+
+We will employ Cython to achieve three goals.
+First of all scalability limitations have to be removed. Python compatibility
+has to be maintained as Fluidity uses it to define other properties apart from
+agent biology. Therefore we have to find way to translate Python code into
 form that is not susceptible to GIL limitations.
 
 Second is to improve single threaded performance. VEW based simulations achieve
@@ -274,9 +306,9 @@ main users of simulation software like Fluidity. By keeping the solution
 as close to pure Python as possible we hope to not limit adoption of
 Fluidity-ICOM as an simulation tool.
 
-Tests initially had been carried out on simplified VEW based simulation
+Tests initially will been carried out on simplified VEW based simulation
 to present feasibility of the approach. Only after satisfactory results
-had been obtained integration into Fluidity-ICOM had been attempted.
+are obtained integration into Fluidity-ICOM is attempted.
 
 \section{Contributions}\label{sec:intro-contrib}
 The contributions of this project are three fold.
