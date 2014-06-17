@@ -1481,7 +1481,7 @@ extent JavaScript, we can see that JIT equipped interpreters can achieve perform
 as good as statically compiled code. Technically there is no reason why Python
 should be slower than JavaScript which is the case currently.
 \\\\
-After replacing Python \lstinline{def} with Cython's \lstinline{cdef} the profile
+After replacing Python's \lstinline{def} with Cython's \lstinline{cdef} the profile
 no longer gets lost and can provide all of the necessary information. Table
 \ref{table:vtune-embedded-profile} shows most costly functions (by CPU time)
 in this version. Some of the functions names have been changed since Cython
