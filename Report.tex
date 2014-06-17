@@ -425,7 +425,7 @@ was only possible due to rapidly rising computer power.
 
 The benefit of individual based metamodels over field and box metamodels
 is the ability to use primitive biological equations to represent
-elements of simulation \cite{IndvPlanktonEcosystems}. Those equations can be
+elements of simulation (\cite{IndvPlanktonEcosystems}). Those equations can be
 obtained by observation of individuals of desired species and does not involve
 analysing large population. As a result the model will represent the nature
 more accurately and gives a possibility of accurate results and
@@ -928,7 +928,7 @@ disappeared over time. The need to remove GIL lessened over time
 with development of modules which operate in pure C or Fortran code
 and therefore can be treaded. In case of I/O and networking the
 problem is mitigated with asynchronous calls. GIL remains issue
-only for CPU intensive tasks.
+only for CPU intensive tasks (\cite{UnderstandingGIL}).
 
 There are downsides to removing GIL though. Without guarantees from
 the interpreter that extension will can be executing only once at
@@ -1440,7 +1440,8 @@ only have one choice for its type.
   \end{center}
 \end{figure}
 
-Figure \ref{fig:cython-typed-perf} shows that the execution time improved by 60\%.
+Figure \ref{fig:cython-typed-perf} shows that the execution time improved by 60\%
+over version presented in Section \ref{sec:embed-py}.
 This version of the simulation is only factor of \emph{22 times} slower.
 While the pay-off for fairly simple modification is significant it is not enough
 to reach C implementation levels.
@@ -2176,6 +2177,22 @@ still 60\% slower than reference C implementation running with 1 thread.
     \includegraphics[width=\columnwidth]{graphs/gil-free-multi-16-perf.eps}
     \caption{Performance of C++ Wrapper version for up to 16 threads.}
     \label{fig:gil-free-multi-16-perf}
+  \end{center}
+\end{figure}
+
+Figure \ref{fig:gil-free-16-ref-perf-comp} is shown to illustrate difficulty in
+parallelising programs. Whenever speedup is sought single thread performance
+should be considered first. Despite being run with 16 threads and being only
+\emph{11 times} slower the version using C++ wrappers still performs worse
+than reference implementation we had started with. Achieving optimal scaling
+is a difficult task due to dependence on memory access patterns.
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[width=\columnwidth]{graphs/gil-free-16-ref-perf-comp.eps}
+    \caption{Performance of C++ Wrapper version for 16 threads against reference C
+      implementation.}
+    \label{fig:gil-free-16-ref-perf-comp}
   \end{center}
 \end{figure}
 
