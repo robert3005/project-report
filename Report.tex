@@ -158,11 +158,39 @@ Dr. Tristan \textsc{Allwood} \\% Supervisor's Name
 
 
 \begin{abstract}
+Modeling marine ecosystem has always been a challenge. Due to sheer scale and
+biological variety observation based experiments are labour intensive. What is more
+interpretation of the results requires knowledge of context in which measurements
+have been taken. The alternative approach is to create model of an ecosystem
+in question and let the properties emerge over time as system grows and goes
+through cycles. By defining individuals in terms of primitive biological equations
+there is no need to study whole populations but single individuals of species of
+interest.
+
+One of the tools to create large scale marine ecosystem simulations is Fluidity-ICOM.
+While Fluidity was created as a general purpose three dimensional fluid
+dynamics code it has been extended to allow introduction of fauna. The software is
+an improvement over predecessors as it employs three dimensional environment modelling
+thus creating more accurate models. Fluidity-ICOM has a performance issues though.
+By allowing for extreme freedom when defining parameters of simulation it defies
+optimisations that are carried out in other simulation software. In particular it
+allows usage of arbitrary Python code to define behaviour of individuals in simulation.
+
+This work investigates how Fluidity-ICOM can be optimised. User supplied code will be
+considered as it constitutes bulk of execution time. Additionally parallelisation is
+impossible due to Python limitations. In this work approach to optimise and parallelise
+user supplied code in semi automated fashion is presented. The solution relies on
+Cython, an optimising compiler for Python.
 \end{abstract}
 \NewPage
 
 \renewcommand{\abstractname}{Acknowledgements}
 \begin{abstract}
+I would like to thank Tony Field, my supervisor, for continuous support and ideas
+for development of the project. I would also like to thank Michael Lange, creator
+of Fluidity-ICOM, for his expert advice and feedback on presented solutions.
+I would also like to thank everyone who kept me motivated throughout the project,
+without you it would have been much more difficult to finish this project.
 \end{abstract}
 \NewPage
 
