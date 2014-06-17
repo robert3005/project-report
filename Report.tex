@@ -158,7 +158,7 @@ Dr. Tristan \textsc{Allwood} \\% Supervisor's Name
 
 
 \begin{abstract}
-Modeling marine ecosystem has always been a challenge. Due to sheer scale and
+Modelling marine ecosystem has always been a challenge. Due to sheer scale and
 biological variety observation based experiments are labour intensive. What is more
 interpretation of the results requires knowledge of context in which measurements
 have been taken. The alternative approach is to create model of an ecosystem
@@ -335,7 +335,7 @@ The contributions of this project are three fold.
 
 \chapter{Background}\label{ch:bkg}
 
-\section{Modeling Plankton Ecosystems}\label{sec:model-plankton-eco}
+\section{Modelling Plankton Ecosystems}\label{sec:model-plankton-eco}
 
 With plankton contributing about 70\% of oxygen production and
 constituting most of biological production on the planet it has
@@ -397,7 +397,7 @@ interaction of organisms with the environment and each other.
 
 Since there is no need to model each organism individually but only
 each property using this metamodel lowers computational complexity
-but forces modeling at higher level of the system. That is the
+but forces modelling at higher level of the system. That is the
 properties of the system and their changes in time have to be studied
 and behaviour has to be extracted. While in nature the behaviour of
 individual organisms lends itself to emergence of patterns in changes
@@ -416,7 +416,7 @@ measurements $$F(x_1,y_1),\ldots,F(x_N,y_N)$$ performed at $N$ discrete
 points $(x_i,y_i)$
 
 \subsection{Individual Metamodel}\label{subsec:agent-meta}
-The individual metamodel is the extreme end of the modeling spectrum.
+The individual metamodel is the extreme end of the modelling spectrum.
 The aim is to represent each organism in the simulation as an object
 and let those interact with environment and each other. Such models
 quickly become complex with due to the size of the simulated problem
@@ -514,10 +514,10 @@ zero flux divergence in every ecosystem property at all depths.
 
 There are two reasons why approximation through one-dimensional model is
 acceptable and will produce good results. First of all, the plankton being
-modeled lives mostly in seasonal boundary layer of the ocean which has structure
+modelled lives mostly in seasonal boundary layer of the ocean which has structure
 controlled mostly by vertical fluxes. Secondly, the horizontal correlation
 scale of the environment variables is typically two orders of magnitude greater
-than the vertical scale. Planktons cannot usefully change their ambient environment
+than the vertical scale. Plankters cannot usefully change their ambient environment
 by swimming horizontally. However, many species of plankton do change their
 ambient environment by swimming horizontally. This one-dimensional model is a very
 good first approximation. It has to be noted though that the principal source
@@ -530,7 +530,7 @@ similar attractors as one-dimensional version.
 
 \subsection{Functional Groups}\label{subsec:fg}
 
-At the core of Lagrangian Ensemble modeling there are functional groups (FG).
+At the core of Lagrangian Ensemble modelling there are functional groups (FG).
 Functional groups are the highest level grouping in marine biodiversity
 parameter space. It defines set of variables that represent agent's internal
 biochemical state. Furthermore it is used to define the set of phenotypic
@@ -545,15 +545,15 @@ agent to next time step.
   \label{fig:fg}
 \end{figure}
 
-Figure \ref{fig:fg} shows grouping hierarchy of ecosystem modeling
+Figure \ref{fig:fg} shows grouping hierarchy of ecosystem modelling
 objects. The plankton community in simulation consists of multiple functional
 groups. Each of communities may be later subdivided into species. In case of
-LE modeling species define parameter set for enclosing functional group set of
+LE modelling species define parameter set for enclosing functional group set of
 equations. Through parameter mutation we can achieve multiple varieties of
 species. Going further down each species can be subdivided into traits.
 Traits allow to factor in ecological adaptation in resource competition models.
 As such traits are a way to incorporate evolution into ecosystem models
-which is a current trend in modeling \cite{Clark20113823}.
+which is a current trend in modelling \cite{Clark20113823}.
 
 The major difference in Lagrangian Ensemble model as proposed by
 \cite{Woods2005} is the ability to capture life-cycle of an individual. This
@@ -565,7 +565,7 @@ allows for incorporation of growth, dormant stages and over-wintering as
 seen in nature. The metamodel acknowledges the fact that physiological
 behaviours of individuals may change over time and thus should be represented
 in the model. Different growth stages constitute important source of intra-population
-variability in ecosystem modeling.
+variability in ecosystem modelling.
 
 \subsection{Model Specification - Planktonica}\label{subsec:planktonica}
 The way in which model is specified in Virtual Ecology Workbench is through
@@ -654,8 +654,8 @@ computational fluid dynamics software, has been adapted to incorporate
 ocean modelling. Fluidity \cite{Piggot2008,fluidity} is capable of
 solving Navier-Stokes equations and accompanying field equations on
 arbitrary unstructured finite element meshes. The computation is
-parallelised using MPI and uses adaptive remeshing to optimize the
-underlying mesh structure at runtime. Therefore achieving computational
+parallelised using MPI and uses adaptive remeshing to optimise the
+underlying mesh structure at run time. Therefore achieving computational
 efficiency and focus on regions of interests. The resulting Fluidity-ICOM
 provides ocean model capable of sub-grid scale parametrization to model
 turbulent mixing as well as embedding of plankton biochemistry.
@@ -692,12 +692,12 @@ diffusivity to achieve turbulent nutrient dissipation.
 VEW generated simulation rely heavily on accurate convection based
 cycle of mixed layer deepening. The key challenge is to integrate
 mixed layer depth model used in VEW and Fluidity's advection-diffusion
-equations. In order to achieve the desired effect K-profile parametrisation
+equations. In order to achieve the desired effect K-profile parametrization
 is used alongside VEW's MLD model.
 
 \myparagraph{Adaptive Remeshing}\label{para:remesh}
 What makes Fluidity attractive for large scale simulations is its ability
-to dynamically adapt the underlying mesh at runtime. The process minimises
+to dynamically adapt the underlying mesh at run time. The process minimises
 discretisation errors and focuses resolution on regions of particular interest.
 The adaptive mesh refinement uses anisotropic metric tensor field which
 describes desired geometric properties necessary to minimise interpolation error.
@@ -783,7 +783,7 @@ those are handled by Fluidity itself and we only need to provide
 configuration options. Agent update code for Fluidity based simple
 LERM model is almost identical to VEW based model. Only changes
 necessary are due to Fluidity-ICOM having proper Python API (outlined
-in \cite{FluidityVEW}). Therefore stage constants, agent dropout (siking)
+in \cite{FluidityVEW}). Therefore stage constants, agent dropout (sinking)
 and agent growth effects had to be replaced by function calls.
 
 
@@ -793,7 +793,7 @@ and agent growth effects had to be replaced by function calls.
 Message Passing Interface is a way of distributing computation
 amongst several machines via network connection. Each of the
 machines (nodes) in the system is able to issue and receive
-messages which are a way to synchronize and distribute data.
+messages which are a way to synchronise and distribute data.
 OpenMPI \cite{gabriel04:_open_mpi} is a result of merger of several MPI libraries, like
 LAM/MPI, LA-MPI, and FT-MPI. It aims to standardise the implementation
 and improve interoperability. Thus reducing the burden on
@@ -813,18 +813,18 @@ for shared-memory parallelism in C, C++ and Fortran programs.
 
 In contrast to other multithreading approaches OpenMP provides high
 abstraction level thus enabling portability. The portability of OpenMP directives
-is ensured by runtime library which is platform dependent part of implementation.
+is ensured by run time library which is platform dependent part of implementation.
 The directives it introduces focus on single program multiple data
 (SPMD) constructs, tasks, worksharing and synchronisation.
-Furthermore the library provides means of sharing and privatizing
+Furthermore the library provides means of sharing and privatising
 data across threads.
 
-OpenMP only covers user-directed parallelization, where programmer explicitly
-states actions which are to be taken by compiler to make program parallel at runtime
+OpenMP only covers user-directed parallelisation, where programmer explicitly
+states actions which are to be taken by compiler to make program parallel at run time
 Any implementation is not required to check for data dependencies, data conflicts,
-race conditions, or deadlocks which may occur in multithread programs.
-The specification does not cover compiler-generated automatic parallelization and
-directives to the compiler to assist such parallelization.
+race conditions, or deadlocks which may occur in multithreaded programs.
+The specification does not cover compiler-generated automatic parallelisation and
+directives to the compiler to assist such parallelisation.
 
 Since OpenMP is tightly integrated with the compiler it is non-trivial to
 understand types of transformation that are performed to make program parallel.
@@ -926,7 +926,7 @@ moreover there was no clear gain from threading the interpreter due
 to lock contention being a bottleneck. As a result the changes have
 disappeared over time. The need to remove GIL lessened over time
 with development of modules which operate in pure C or Fortran code
-and therefore can be treaded. In case of I/O and networking the
+and therefore can be threaded. In case of I/O and networking the
 problem is mitigated with asynchronous calls. GIL remains issue
 only for CPU intensive tasks (\cite{UnderstandingGIL}).
 
@@ -974,7 +974,7 @@ that Python has a stable API better approaches have been proposed,
 most significant of which is Cython. Cython allows users to write
 Python like syntax which in turn is compiled to Python C/API
 with appropriate function calls and boilerplate generated
-automatically. Cython gives the flexbility of Python while allowing
+automatically. Cython gives the flexibility of Python while allowing
 compatibility with C applications without the need to understand
 inner workings of CPython.
 
@@ -1042,7 +1042,7 @@ The more saturated yellow on the line is the more lines it will take in
 the generated C code. If the line is white the source code line will have
 direct translation to one line of C/C++ code. If all of the code translates
 directly then it isn't touching any of Python internals and we effectively
-have eliminated Python as a runtime requirement. Listing \ref{list:python-cython}
+have eliminated Python as a run time requirement. Listing \ref{list:python-cython}
 is an example of code that will translate directly to C.
 
 \subsection{Python embedding with Cython}\label{sec:embed-cython}
@@ -1087,16 +1087,16 @@ void cython_call() {
 
 It is crucial to call \lstinline{initmodulename()} since it serves as a setup
 function for the module, it executes any global code (outside of any function)
-and initializes Python environment. Calling functions from module is still
-possible given theydon't rely on any of those. We will exploit this fact in
+and initialises Python environment. Calling functions from module is still
+possible given they don't rely on any of those. We will exploit this fact in
 when implementing Python compilation in Fluidity.
 
 \chapter{Simple LERM Model}\label{ch:opt-simpl-lerm}
-In work done by \cite{FluidityVEW} it has been shown that Langrangian
+In work done by \cite{FluidityVEW} it has been shown that Lagrangian
 Ensemble metamodel can be successfully embedded in unstructured
 three-dimensional mesh. The work mentions that resulting software while
 flexible has severe performance limitations. The core Fluidity code
-is heavily optimized and relies on OpenMPI and OpenMP to distribute
+is heavily optimised and relies on OpenMPI and OpenMP to distribute
 the work to available machines. However, due to flexibility of model
 specification through Python and the limitations of Python outlined
 earlier (GIL) the biological aspect of the simulation is effectively
@@ -1130,8 +1130,8 @@ out. By considering Simple LERM model with embedded Python code for agent
 agent we achieve minimal example that exhibits same characteristics. Later
 we will see how the solution implemented in Simple LERM model can be ported
 to Fluidity-ICOM. The difference in implementations comes from the fact
-that Fluidity-ICOM has enable runtime configuration and as such the code
-that has to be optimised is only known at runtime.
+that Fluidity-ICOM has enable run time configuration and as such the code
+that has to be optimised is only known at run time.
 
 \section{Experimental setup}\label{sec:exp-setup}
 
@@ -1141,7 +1141,7 @@ out on a machine with quad core Haswell CPU (i7 4770 @ 3.4 GHz) with
 16 GB of RAM (memory capacity is not a problem for simulation in
 question, memory latency on the other hand is). Care
 had been taken to ensure that hyper threading does not distort the results.
-To tests scalability and multi threaded behaviour of the simulation further
+To tests scalability and multithreaded behaviour of the simulation further
 additional tests had been run on machine with 4 Sandy Bridge CPUs
 (8 cores each - E5-4650 @ 2.7 Ghz) with 500 GB of ram. However, only 2 CPUs
 have been used as the performance profile is not likely to change when
@@ -1162,7 +1162,7 @@ The profiler output, however, has been obtained with different compilation
 flags and on different machine - quad core Haswell CPU (i7 4750 @ 2.0 GHz)
 and 16 GB RAM. This is mostly due to VTune being a GUI program and a such it's
 fastest to use it from machine with physical connection.
-To allow profiler properly resolve all symbols at runtime, the simulation
+To allow profiler properly resolve all symbols at run time, the simulation
 was compiled with ``-Og'' (recommended optimisation level for debugging)
 and ``-g''. Those two options can degrade performance significantly compared
 to ``-O2''. Therefore profiler output should be treated only in relative
@@ -1206,7 +1206,7 @@ the curve should be preserved. We can notice that agent count follows biomass
 - larger biomass of the system the more the agents to  represent it.
 
 The simulation itself is an update loop with logic for loading the
-environment and storing results. As such it can be summarized by
+environment and storing results. As such it can be summarised by
 Listing \ref{list:vew-main-loop}
 
 \begin{lstlisting}[
@@ -1353,7 +1353,7 @@ memory efficient and faster than generic Python classes. The main difference
 comes from the fact that they use C struct to store fields and methods instead
 of Python dict. This enables them to store arbitrary C types without requiring
 Python wrapper and accessing fields and methods directly at C level without
-Python dictionary lookup. Generic Python classes can inherit from cdef classes
+Python dictionary look up. Generic Python classes can inherit from cdef classes
 but converse is not possible. Since Cython requires to know the complete inheritance
 hierarchy to properly lay out the C structs, and limits it to single inheritance.
 Python classes, however, can inherit from any number of Python classes and
@@ -1477,7 +1477,7 @@ mentioned details and with liberal language semantics the interpreter cannot
 produce efficient code. This is the trade off of dynamic typing. PyPy is a
 project which aims to recover some of the performance lost due to CPython
 interpreter via JIT compiler. From other languages like Java, and to lesser
-extent JavaScrip, we can see that JIT equipped interpreters can achieve performance
+extent JavaScript, we can see that JIT equipped interpreters can achieve performance
 as good as statically compiled code. Technically there is no reason why Python
 should be slower than JavaScript which is the case currently.
 \\\\
@@ -1539,7 +1539,7 @@ operations implemented natively by every CPU. Furthermore there is type conversi
 happening as illustrated by \lstinline{PyFloat_FromDouble} and \lstinline{float_dealloc}.
 Rest of the overhead comes from difference between arrays and dictionaries (hash maps).
 Retrieving element from hash map is significantly more expensive as the profiler has
-shown (\lstinline{dict_subscript} is function responsible for dictionary lookup).
+shown (\lstinline{dict_subscript} is function responsible for dictionary look up).
 
 From overall execution time of 451.1 seconds the highlighted functions constitute 328.4
 seconds which is over 70\% (the listing shown is not comprehensive since full output
@@ -1551,7 +1551,7 @@ Having in mind the profiling results from previous section we realise that
 it is CPython implementation that is slow compared to C. The abstracted numerical
 operations, memory management and dictionary references are extremely costly
 when compared to machine instructions. To achieve further performance
-improvements we need to address the issue of Python runtime dependency.
+improvements we need to address the issue of Python run time dependency.
 While it is essential to remove single threaded performance bottlenecks there is
 also a more important goal to achieve - enabling multithreaded execution. This
 in turn means that we have to find a way to produce GIL free code for the
@@ -1615,7 +1615,7 @@ implementation. When we look at the documentation of \lstinline{std::map<K, V>}
 we will notice that it is actually a red black tree. While in most cases
 the difference might not be noticeable - especially if the code performs
 many writes to the map. Only C++11 standard provided \lstinline{std::unordered_map<K, V>}
-which is implemented as an actual hash map with $O(1)$ lookup complexity. Given our use case
+which is implemented as an actual hash map with $O(1)$ look up complexity. Given our use case
 where the map is only written to once - at creation time - and then
 read from to provide index values to array the \lstinline{std::unordered_map} is
 a better solution. It should be noted that performance difference would be not large
@@ -1703,7 +1703,7 @@ have to travel through L3 cache.
 \subsection{Further Optimisations}\label{subsec:further-opt}
 If we want to achieve results comparable with reference C version we have to once again
 defer to profiler for help. There is a presumption that the overhead caused by
-\lstinline{std::unordered_map} and \lstinline{std::strin} over \lstinline{float *} and
+\lstinline{std::unordered_map} and \lstinline{std::string} over \lstinline{float *} and
 and \lstinline{char *}.
 
 \begin{table}
@@ -1741,15 +1741,15 @@ and \lstinline{char *}.
 \end{table}
 
 Quick look at Table \ref{table:vtune-gil-free-profile} shows that it is exactly the case.
-The highlighted lines are functions which perform lookup on \lstinline{std::unordered_map}.
-Given that the lookup is exhaustive - whole map will be read for each agent update function
+The highlighted lines are functions which perform look up on \lstinline{std::unordered_map}.
+Given that the look up is exhaustive - whole map will be read for each agent update function
 call and number of times it is done the overhead seems justifiable. In the end we have
 gained convenience of accessing agent fields via natural names instead of integer values.
 Hence, only possible way of improving the code further is finding a way of replacing
 hash maps with static arrays. This goes against possible extensibility and ease of use since
 the code is dependent of memory layout. Furthermore only in the VEW based example we have
 detailed knowledge of constants and way agents are allocated. In case of Fluidity-ICOM
-the situation is more complicated since only at runtime we will know the layout of agents
+the situation is more complicated since only at run time we will know the layout of agents
 in memory and would have to perform substitutions on the fly. In fact we can do exactly that.
 In Fluidity-ICOM there is an initial compilation stage at which the memory layout is already
 known but before the agent update code has been compiled. We will hook into that process
@@ -1834,7 +1834,7 @@ threads. While if look at the whole program performance we only achieve 2.58 and
 
 Since the speedups are not consistent amongst different agent levels it suggests that
 the overhead of data movement (even only to L3) is greater than gain in execution time.
-VTune confirms our findings saying that our program is backend bound (computation) and
+VTune confirms our findings saying that our program is back end bound (computation) and
 fully saturates floating point pipeline of the CPU.
 
 Full results with separation for agent update, Particle Management and environment management
@@ -1915,7 +1915,7 @@ C code. We have changed the way arguments are passed into the function as well
 as the way functions are defined. However, that was not enough to achieve
 same performance level as reference implementation. In the end we had to
 remove convenience of the dictionary and substitute it with pure arrays.
-However, since this step is dependent on memory layout at program runtime
+However, since this step is dependent on memory layout at program run time
 we will perform the substitution automatically and allow users specify
 their programs with dictionaries. Figure \ref{fig:compared-single-perf} shows
 single threaded performance for all of the code versions we had analysed.
@@ -1938,14 +1938,14 @@ threads on 2 CPUs and how data movement and separate caches impact performance.
 Some of the design decisions that we have made when working with VEW based
 simulation were based on the fact that the target software which would
 be using our technique is different and exhibits different properties.
-For instance we need dynamic loading since Fluiditiy-ICOM is large
+For instance we need dynamic loading since Fluidity-ICOM is large
 piece of software and fully customisable by the user. Hence, recompiling
 it each time is not a possible solution. Secondly we have decided
 not to focus on any other parts of the simulation than the agent update.
 Being computational fluid dynamics computation software Fluidity is
 optimised to handle environment changes efficiently. We only have to consider
 performance of variable code supplied by the user. Furthermore Fluidity
-already embeds Python for customizing other parts of the runtime, hence,
+already embeds Python for customising other parts of the run time, hence,
 replacing Python with a different language would have increase amount
 of work necessary. Last but not least we have removed dictionaries in favour
 of plain arrays to optimise performance. This was dictated by Fluidity-ICOM
@@ -1965,7 +1965,7 @@ Fluidity is a mixture between C and Fortran therefore we cannot chose
 different Python implementation than CPython. Furthermore it already
 integrates CPython (PyPy might have been an alternative provided it
 had better embedding capabilities). Fluidity reads the configuration from
-xml file supplied by the user. For purpose of ecosystem modeling the
+XML file supplied by the user. For purpose of ecosystem modelling the
 configuration contains the code that defines functional groups in the
 simulation, specifies the initial conditions and types of fields that are
 present in the simulation. The code that will be run by the simulation has
@@ -2033,7 +2033,7 @@ of the model.
 Further threading results will shown to illustrate the performance
 on multi CPU architectures. Results in this section all come from
 benchmark results from machine with 4 Sandy Bridge CPUs
-(8 cores each - E5-4650 @ 2.7 Ghz) with 500 GB of RAM. However,
+(8 cores each - E5-4650 @ 2.7 GHz) with 500 GB of RAM. However,
 only 2 CPUs have been used as mentioned in Section \ref{sec:exp-setup}.
 We will use results from both machines to compare the architectures and
 try to understand what type of low level features affect the execution
@@ -2046,7 +2046,7 @@ On the other hand the reference C version does not provide modular
 code loading. Whole simulation code has to be recompiled if changes
 to agent behaviour are necessary. With large simulation software
 this approach is not feasible as the configuration is only known at
-runtime. Recompiling whole simulation application between changes
+run time. Recompiling whole simulation application between changes
 wouldn't yield good user experience and introduce unnecessary overhead.
 
 \begin{figure}[H]
@@ -2281,7 +2281,7 @@ However, Haswell has larger throughput and can sustain 256-bit loads and a
 256-bit store every cycle. In contrast, Sandy Bridge can only support two
 128-bit reads and a 128-bit write per cycle. Given how dependent on data
 movements the performance is this seems to be an important feature. With our
-code performing large number of data lookups this difference seems to be
+code performing large number of data look ups this difference seems to be
 significant. The presumption comes from the fact that the benefit Haswell
 has increases when going from 1 thread to 4 (from 45\% to 50\%). The more
 important part though are Fused Multiply Add (FMA) and lower latency floating
@@ -2297,7 +2297,7 @@ roughly 10\% improvement for same clock speeds. Our simulation gets
 visibly larger boost from changing the underlying architecture.
 
 \section{Load balancing}\label{sec:eval-load-balance}
-Through out the benchmarking process the OpenMP scheduler was set to ``runtime''
+Through out the benchmarking process the OpenMP scheduler was set to ``run time''
 and configured to ``dynamic,50'' as a value that was found to be good enough
 during quick testing. In order to verify that we had chosen right value
 and there is no possible improvement due to changes in the way data is
@@ -2384,7 +2384,7 @@ been defined. That operation had cut down the penalty in half to roughly
 while preserving name based access to agent's variables. This involved
 recreating wrapper created in Python in C++. As a result of replacing
 all of the code with typed versions and C++ containers instead of Python
-ones reliance on Python at runtime had been removed. This version while
+ones reliance on Python at run time had been removed. This version while
 still \emph{11} times slower had the ability to execute on multiple threads.
 We have seen how the code scales. Nonetheless due to non linear scaling
 and significant single threaded performance slowdown this version was
@@ -2393,7 +2393,7 @@ still not adequate for use in larger systems.
 The last step was to replace C++ containers and remove name based access
 to agent's variable. By using plain C arrays we had achieved performance
 levels of reference version while maintaining the ability to load code
-dynamically at runtime. Furthermore compatibility with Python had been
+dynamically at run time. Furthermore compatibility with Python had been
 preserved if multithreaded execution and performance are not a concern.
 
 We had looked at how the code scales and whether the simulation produces
@@ -2414,7 +2414,7 @@ scale to very large models.
 
 \section{Related Work}\label{sec:related}
 The approach outlined in this report is not the only possible one to
-achieve thread level parallelisim in Python. Other projects present
+achieve thread level parallelism in Python. Other projects present
 more universal approaches, however, none of them solves the problem
 of CPython compatibility and CPU bound tasks. As such while the work
 does not present any new piece of software it outlines how existing
@@ -2462,10 +2462,10 @@ likely not scale for CPU intensive tasks.
 The last of related projects are Python interpreters written in languages
 that provided real garbage collectors. Jython is Python implementation on
 top of JVM and IronPython uses C\# Dynamic Language Runtime provided by
-.NET. Both of the runtimes provide real parallelism through virtual machines
+.NET. Both of the run times provide real parallelism through virtual machines
 and since they are not using reference counting for garbage collection
 they are not susceptible to GIL. While they fit the performance characteristics
-for our application they are highly dependent on the runtimes they work on.
+for our application they are highly dependent on the run times they work on.
 Therefore it is not possible to easily embed Jython or IronPython outside
 of JVM based applications or .NET respectively. Last but not least they
 do not provide binary compatibility between CPython, hence, its extensions
@@ -2484,11 +2484,11 @@ can produce Python compatible extension that can also have C interface.
 Why not provide Python interpreter with compilation capabilities directly.
 It does not have to be a full scaled JIT compiler but something that would
 analyse the code being executed, perform type inference or use types provided
-by user to optimise the module code and substitute it at runtime upon loading.
+by user to optimise the module code and substitute it at run time upon loading.
 Since Cython provides function decorators to specify types the code could
 be compatible with pure Python. This would work like \lstinline{pyximport}
 with a boost where an attempt at type inference would be made and it would have
-been integrated directly into language runtime without the need to explicitly
+been integrated directly into language run time without the need to explicitly
 indicate that we might be importing Cython modules.
 
 Cython's main limitation is the fact that it extends Python's syntax and as
