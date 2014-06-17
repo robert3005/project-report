@@ -2,7 +2,7 @@
 % do not stop on errors
 \nonstopmode
 
-\title{Accelerating agent based\\Python models}
+\title{Accelerating agent-based\\Python models}
 \date{\today}
 \author{Robert Kruszewski}
 
@@ -108,7 +108,7 @@
 %----------------------------------------------------------------------------------------
 
 \HRule \\[0.4cm]
-{ \huge \bfseries Accelerating agent based\\\vspace{0.4cm}Python models}\\[0.4cm] % Title of your document
+{ \huge \bfseries Accelerating agent-based\\\vspace{0.4cm}Python models}\\[0.4cm] % Title of your document
 \HRule \\[1.5cm]
 
 %----------------------------------------------------------------------------------------
@@ -840,7 +840,7 @@ void main() {
   #pragma omp parallel
   {
     int ID = omp_get_thread_num();
-    printf(“Hello world(%d)”, ID);
+    printf('Hello world(%d)', ID);
   }
 }
 \end{lstlisting}
@@ -852,7 +852,7 @@ void main() {
 ]
 void __ompregion_main1(...) {
   int ID = ompc_get_thread_num();
-  printf(“Hello world(%d)”,ID);
+  printf('Hello world(%d)',ID);
 } /* end of ompregion_main1*/
 
 void main() {
@@ -2123,7 +2123,7 @@ there's no bump after bloom periods.
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=\columnwidth]{graphs/bio-multi-comp.eps}
-    \caption{Biomass comparison between different code versions for 8 threads.}J
+    \caption{Biomass comparison between different code versions for 8 threads.}
     \label{fig:bio-multi-comp}
   \end{center}
 \end{figure}
@@ -2452,7 +2452,7 @@ threads. The child threads spawned by a master thread are given only
 read access to memory. If communication is necessary with the main
 thread the implementation provides simple snapshotting techniques
 similar to STM but not so sophisticated. The implementation works
-by replacing CPython GIL acquire and release routines and replacing them
+by replacing CPython GIL acquire and release routines
 with own implementations that resolve multiple access conflicts. This
 approach while extremely successful for event oriented architecture
 where process needs short lived workers to handle a request will
