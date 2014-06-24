@@ -1414,7 +1414,7 @@ not help function name resolution). As a result any code that is directly import
 Python mechanism is a black box from optimisation perspective. However, if we already
 use Cython we can statically compile the agent update code as an extension
 to be able to investigate parts of it further. That is where Cython helps
-us further. Being targeted as easy way to create Python modules the changes necessary
+us significantly. Being targeted as easy way to create Python modules the changes necessary
 are minimal - adding only another source file to distutils setup script.
 Since we have to pass the update code through compiler to obtain meaningful profiler
 output other optimisations can be introduced. We need any possible feature
