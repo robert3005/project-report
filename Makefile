@@ -1,4 +1,11 @@
-all:
+.PHONY: report watch clean all presentation
+
+all: report presentation
+
+presentation:
+	pdflatex Presentation
+
+report:
 	latex Report
 	bibtex Report
 	pdflatex Report
