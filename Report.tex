@@ -1485,7 +1485,7 @@ After replacing Python's \lstinline{def} with Cython's \lstinline{cdef} the prof
 no longer gets lost and can provide all of the necessary information. Table
 \ref{table:vtune-embedded-profile} shows most costly functions (by CPU time)
 in this version. Some of the functions names have been changed since Cython
-generates extremely long names. The highlighted lines are parts which are
+generates extremely long ones. The highlighted lines are parts which are
 present in Python version of the code but are not in the reference C version.
 This is the overhead that Python causes. In fact there is a lot more performance
 loss caused by Python but without line by line analysis of the code it is
@@ -1849,7 +1849,7 @@ to section about threading version with C arrays \ref{appen-subsec:bench-array-m
   \end{center}
 \end{figure}
 
-\subsection{Cache contention}\label{subsec:cache-contetion}
+\subsection{Cache contention}\label{subsec:cache-contention}
 The VEW based simple LERM model was not made to be threaded. Therefore initial threading
 implementation was unnecessarily slow as it was designed for single thread execution.
 Here again VTune turned out to be of great use showing places where performance was
@@ -1904,7 +1904,7 @@ number of threads the performance would degrade further. Figure
 after per thread environment variables and reduction phase has been introduced.
 
 More detailed analysis of multithreaded performance of simulation as well as
-correctness of the model will be shown in \ref{ch:evaluation}.
+correctness of the model will be shown in Chapter \ref{ch:evaluation}.
 
 \section{Summary}\label{sec:simple-lerm-summ}
 In this chapter we have shown how to eliminate performance penalty associated
@@ -3083,7 +3083,7 @@ that need to be followed when we want use Cython to generate GIL free code.
     \lstinline{cdivision=True} either in compiler options or as a file annotation.
   \item If you are not sure what is default behaviour for allocating certain values
     use type casting. This is especially useful for strings when Cython will
-    be default allocate Python's \lstinline{str} and only then coerce to desired
+    by default allocate Python's \lstinline{str} and only then coerce to desired
     type. Use \lstinline{<char *>} to enforce C semantics.
   \item When in doubt use Cython's annotation facility to illustrate where the
     code translation is not direct.
@@ -3097,7 +3097,7 @@ line take to express. Direct translations are without highlight as each line tra
 directly to one line of target code.
 
 \begin{lstlisting}[
-  caption=Python code annotated by cython,
+  caption=Python code annotated by Cython,
   label=list:appen-python-annot,
   language=python,
   linebackgroundcolor={
@@ -3114,7 +3114,7 @@ def sumTo(n):
     return c
 \end{lstlisting}
 
-Listing \ref{list:appen-python-annot} shows necessary changes to ensure that the
+Listing \ref{list:appen-python-cython} shows necessary changes to ensure that the
 function is translated directly into its C counterpart. All of the variables
 have type specified. The return type of the function is also provided. Function
 is declared as \lstinline{cdef} therefore it is only accessible from C like context.
@@ -3139,7 +3139,10 @@ can be large due to extensive boilerplate, once that is stripped out they are
 just plain C.
 
 \chapter{Addendum - Model Correctness}\label{appen-ch:add-model-correctness}
-Section \ref{sec:model-correct}
+Section \ref{sec:model-correct} showed biomass of the ecosystem simulated with number
+of agents. The results shown there suggest that the changes made to improve performance
+sacrifice accuracy of the model. All of the steps from Chapter \ref{ch:opt-simpl-lerm}
+have been reimplemented to ensure that the results are in fact correct.
 
 \begin{figure}[H]
   \begin{center}
@@ -3157,6 +3160,16 @@ Section \ref{sec:model-correct}
   \end{center}
 \end{figure}
 
+From Figure \ref{fig:bio-fixed-single-float-comp} and \ref{fig:ag-fixed-single-float-comp}
+we see that there's a small discrepancy in the biomass. It seems to be higher for versions
+avoiding Python as runtime. It is important to note that Python uses doubles to represent
+all floating point numbers. Therefore there is some type casting involved when mixing
+pure C code and Python. Furthermore pure Python implementation will perform operations
+on double precision numbers therefore yielding slightly different results. Both versions
+which avoid GIL show a loss in accuracy during second bloom period. Likely cause of
+multiple conversions and casting happening. The number of agents stays stable though
+despite the difference in biomass.
+
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=\columnwidth]{graphs/bio-fixed-single-double-comp.eps}
@@ -3173,6 +3186,21 @@ Section \ref{sec:model-correct}
   \end{center}
 \end{figure}
 
+If instead of declaring temporary variables as \lstinline{float} we declare them
+as \lstinline{double} the results are as shown in Figure \ref{fig:bio-fixed-single-double-comp}
+and \ref{fig:ag-fixed-single-double-comp}. The number of agents does not change but
+the differences between code versions are almost eliminated. The typed Cython version
+behaves like pure Python since there is no type casting and the resulting code
+should work in similar fashion. The difference from floating point precision
+to double point and the fact that with double point precision we are closer to reference
+implementation can be attributed to differences in Cython and GCC. It is likely
+that Cython's code transformations do not preserve accuracy of results. Therefore
+Cython generates intermediate results and assigns them to floats. Then GCC does not
+optimise/inline the resulting code which should be the case in reference implementation.
+Detailed analysis of intermediate representations should be necessary. Using double
+point precision allows us to avoid rounding errors which are undoubtedly occurring with
+single precision leading to different results.
+
 \begin{figure}[H]
   \begin{center}
     \includegraphics[width=\columnwidth]{graphs/bio-fixed-multi-double-comp.eps}
@@ -3188,6 +3216,16 @@ Section \ref{sec:model-correct}
     \label{fig:ag-fixed-multi-double-comp}
   \end{center}
 \end{figure}
+
+It has also been said that the changes to the code to avoid cache contention on shared
+environment variables change the behaviour of the simulation (Section \ref{subsec:cache-contention}).
+However, after more thorough analysis the conclusion should have been that those changes
+do not affect results of the model. Shared environment variables are not updated up until
+next iteration of the simulation. Therefore all agents always see the same state at the
+beginning of agent update loop. Hence, the changes should not change results which
+hopefully is shown in Figure \ref{fig:bio-fixed-multi-double-comp} and \ref{fig:ag-fixed-multi-double-comp}.
+All multithreaded versions used double precision variables for temporaries in agent update
+code.
 
 \end{appendices}
 
