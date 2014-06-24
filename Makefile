@@ -10,8 +10,11 @@ report:
 	bibtex Report
 	pdflatex Report
 
-watch:
-	./build.sh
+watch-report:
+	./build.sh Report.tex
+
+watch-presentation:
+	./build.sh Presentation.tex
 
 clean:
 	@# Remove all ignored files apart from sublime project settings
