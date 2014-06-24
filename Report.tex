@@ -301,7 +301,7 @@ Python as an abstraction layer that limits performance was considered to be
 equally important to achieving parallel execution.
 
 Last but not least is the need to maintain similarity to current system.
-Python is gaining adoption and is becoming popular scientists who are
+Python is gaining adoption and is becoming popular amongst scientists who are
 main users of simulation software like Fluidity. By keeping the solution
 as close to pure Python as possible we hope to not limit adoption of
 Fluidity-ICOM as an simulation tool.
@@ -311,7 +311,7 @@ to present feasibility of the approach. Only after satisfactory results
 are obtained integration into Fluidity-ICOM is attempted.
 
 \section{Contributions}\label{sec:intro-contrib}
-The contributions of this project are three fold.
+The contributions of this project are threefold.
 \begin{itemize}
   \item We begin by demonstrating Python's impact on performance
     of programs. In Chapter \ref{ch:opt-simpl-lerm} approach to
@@ -350,8 +350,8 @@ understanding plankton development is crucial.
 Marine ecology can be understood by observations. It involves
 taking measurements in specified region and computing statistical
 properties in question. This process is limited with its scale
-and require understanding of the context in which the measurements
-re taken. On the other hand mathematical simulation involve creating
+and requires understanding of the context in which the measurements
+are taken. On the other hand mathematical simulation involves creating
 abstract representation of the environment and objects in it and
 allow the underlying principles develop the ecosystem through time.
 Despite the fact that our knowledge of marine ecosystems is limited
@@ -502,7 +502,7 @@ defined by the user.
 
 Figure \ref{fig:env} illustrates the environment that is employed by VEW
 to carry out its simulation. The physical environment as defined by \cite{Woods2005}
-is a one-dimensional water column for us in open ocean where water depth exceeds 1km.
+is a one-dimensional water column for use in open ocean where water depth exceeds 1km.
 The vertical axis extends from the sea surface to depth of, typically, 0.5km.
 VEW allows for the column to drift with ocean currents or be hoisted in place.
 Solar and infra-red radiation, sensible and latent heat, water vapour
@@ -931,9 +931,9 @@ problem is mitigated with asynchronous calls. GIL remains issue
 only for CPU intensive tasks (\cite{UnderstandingGIL}).
 
 There are downsides to removing GIL though. Without guarantees from
-the interpreter that extension will can be executing only once at
-a time the development of them become more difficult. Without GIL
-developers of 3rd party modules has to make their code thread-safe
+the interpreter that extension can be executing only once at
+a time the development of them becomes more difficult. Without GIL
+developers of 3rd party modules have to make their code thread-safe
 which can prove to be difficult and require significant effort.
 
 \section{Embedding Python in C}\label{sec:python-embedding}
@@ -2345,7 +2345,7 @@ agent update loop. With Fluidity-ICOM being able to run simulations
 at arbitrarily large machines (Fluidity itself performs partitioning
 of the data via OpenMPI) it then can be used to recreate complicated
 experiments and provide a tool that is as capable as VEW. Furthermore
-as VEW uses Planktonica to model specification the types of models that
+as VEW uses Planktonica for model specification the types of models that
 it can represent are limited by the expressiveness of the tool. With
 Cython as a definition language the possibilities are unlimited  since
 we are using a fully fledged programming language.
